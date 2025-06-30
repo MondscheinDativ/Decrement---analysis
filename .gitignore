@@ -192,3 +192,39 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# 数据文件
+/data/
+/outputs/
+
+# 环境文件
+.env
+.venv
+venv/
+env/
+
+# 日志文件
+*.log
+logs/
+
+# Python缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 编辑器文件
+.idea/
+.vscode/
+*.code-workspace
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 测试覆盖率
+.coverage
+htmlcov/
+
+# Jupyter笔记本
+.ipynb_checkpoints/
