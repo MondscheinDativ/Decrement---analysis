@@ -1,0 +1,14 @@
+1.HMD data are primarily used for academic research and policy analysis related to mortality and demography. When using HMD data, users should properly cite the data source.
+2.All of CDC WONDER's datasets are covered by the following policy: These data are provided for the purpose of statistical reporting and analysis only. The CDC/ATSDR Policy on Releasing and Sharing Data prohibits linking these data with other data sets or information for the purpose of identifying an individual. If the identity of an individual described in a data set is discovered inadvertently, make no disclosure or other use of this information and report the discovery to the Associate Director for Science, Office of Science Policy and Technology Transfer, CDC.
+Data obtained from the National Center for Health Statistics, including Compressed Mortality, Fetal Deaths, Linked Birth / Infant Death records, Multiple Cause of Death, Natality, Provisional Mortality, Underlying Cause of Death, and other presentations of vital records data, are also covered by the following policy: The Public Health Service Act (42 U.S.C. 242m(d)) provides that the data collected by the National Center for Health Statistics (NCHS) may be used only for the purpose for which they were obtained; any effort to determine the identity of any reported cases, or to use the information for any purpose other than for statistical reporting and analysis, is against the law. Therefore users will:
+Use these data for statistical reporting and analysis only.
+Do not present or publish statistics representing nine or fewer births or deaths, including rates based on counts of nine or fewer births or deaths, in figures, graphs, maps, tables, etc.
+Make no attempt to learn the identity of any person or establishment included in these data.
+Make no disclosure or other use of the identity of any person or establishment discovered inadvertently and advise the Director, NCHS of any such discovery.
+By using these data you signify your agreement to comply with the above-stated statutorily based requirements. Researchers who violate the terms of the data use restrictions will lose access to WONDER and their sponsors and institutions will be notified. Researchers who are suspected of violating the rules may be prevented from using WONDER until an investigation can be completed. Deliberately making a false statement in any matter within the jurisdiction of any department or agency of the Federal government violates 18 USC 1001 and is punishable by a fine of up to $10,000 or up to 5 years in prison, or both.
+3.References:
+Human Mortality Database (HMD)
+Centers for Disease Control and Prevention (CDC)
+CDC/ATSDR Policy on Releasing and Sharing Data
+Public Health Service Act (42 U.S.C. 242m(d))
+Confidential Information Protection and Statistical Efficiency Act or CIPSEA (44 U.S.C. 3561-3583)
