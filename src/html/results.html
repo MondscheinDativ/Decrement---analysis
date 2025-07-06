@@ -1,0 +1,139 @@
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">对比设置</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">选择对比类型</label>
+                    <select class="form-select" id="comparisonType">
+                        <option value="models">不同模型</option>
+                        <option value="datasets">不同数据集</option>
+                        <option value="parameters">不同参数</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">选择对比项目</label>
+                    <div id="comparisonItems">
+                        <div class="alert alert-info">请先选择对比类型</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">对比指标</label>
+                    <select class="form-select" id="comparisonMetric" multiple>
+                        <option value="AIC">AIC值</option>
+                        <option value="BIC">BIC值</option>
+                        <option value="Residual">残差自相关</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary w-100" id="runComparisonBtn" disabled>
+                    <i class="fas fa-play me-2"></i> 运行对比
+                </button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">对比选项</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">图表类型</label>
+                    <select class="form-select" id="chartType">
+                        <option value="bar">条形图</option>
+                        <option value="line">折线图</option>
+                        <option value="scatter">散点图</option>
+                        <option value="heatmap">热力图</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">显示选项</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="showConfidenceIntervals" checked>
+                        <label class="form-check-label" for="showConfidenceIntervals">显示置信区间</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="showDifferences">
+                        <label class="form-check-label" for="showDifferences">显示差异</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="normalizeValues">
+                        <label class="form-check-label" for="normalizeValues">标准化值</label>
+                    </div>
+                </div>
+                <button class="btn btn-outline-primary w-100" id="updateChartsBtn" disabled>
+                    <i class="fas fa-sync-alt me-2"></i> 更新图表
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">对比结果</h5>
+                <div>
+                    <button class="btn btn-sm btn-outline-light me-2" id="exportComparisonBtn" disabled>
+                        <i class="fas fa-download me-1"></i> 导出
+                    </button>
+                    <button class="btn btn-sm btn-outline-light" id="saveComparisonBtn" disabled>
+                        <i class="fas fa-save me-1"></i> 保存
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="nav nav-tabs" id="comparisonTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button">摘要</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button">详细信息</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="visualization-tab" data-bs-toggle="tab" data-bs-target="#visualization" type="button">可视化</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content py-3" id="comparisonTabsContent">
+                    <div class="tab-pane fade show active" id="summary" role="tabpanel">
+                        <div class="alert alert-info" id="noComparisonMessage">
+                            请先运行对比以查看结果。
+                        </div>
+                        <div id="summaryContent" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="details" role="tabpanel">
+                        <div class="alert alert-info">
+                            请先运行对比以查看详细信息。
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="visualization" role="tabpanel">
+                        <div class="alert alert-info">
+                            请先运行对比以查看可视化结果。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">对比说明</h5>
+            </div>
+            <div class="card-body">
+                <div id="comparisonNotes">
+                    <p>使用此页面可以比较不同模型、数据集或参数设置下的分析结果。</p>
+                    <ol>
+                        <li>选择对比类型（模型、数据集或参数）</li>
+                        <li>选择要对比的具体项目</li>
+                        <li>选择感兴趣的对比指标</li>
+                        <li>点击"运行对比"按钮生成结果</li>
+                    </ol>
+                    <p class="mb-0">在"可视化"选项卡中，您可以调整图表类型和显示选项。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
