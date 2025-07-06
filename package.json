@@ -1,17 +1,36 @@
 {
-    "name": "Decrement---analysis",
-    "version": "1.0.0",
-    "description": "Frontend for Actuarial Analysis Platform",
-    "scripts": {
-        "start": "live-server --port=3000"
-    },
-    "dependencies": {
-        "bootstrap": "^5.3.0",
-        "jquery": "^3.6.0",
-        "plotly.js": "^2.14.0",
-        "font-awesome": "^6.4.0"
-    },
-    "devDependencies": {
-        "live-server": "^1.2.2"
-    }
+  "name": "actuarial-decrement-analysis-platform",
+  "version": "1.0.0",
+  "description": "Frontend for Actuarial Analysis Platform",
+  "scripts": {
+    "start": "live-server --port=3000",
+    "build": "webpack --mode production",
+    "test": "jest"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.0",
+    "jquery": "^3.6.0",
+    "plotly.js": "^2.14.0",
+    "font-awesome": "^6.4.0",
+    "papaparse": "^5.3.0",
+    "file-saver": "^2.0.5"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^4.10.0",
+    "jest": "^29.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }
