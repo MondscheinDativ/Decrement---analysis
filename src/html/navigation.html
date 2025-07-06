@@ -1,0 +1,69 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="#" onclick="loadPage('index')">精算分析平台</a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadPage('index')">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadPage('data-pipeline')">数据管道</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadPage('analysis')">疫情分析</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="loadPage('results')">结果对比</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown">
+                        工具仪表盘
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">死亡率分析</a></li>
+                        <li><a class="dropdown-item" href="#">准备金计算</a></li>
+                        <li><a class="dropdown-item" href="#">风险模型</a></li>
+                    </ul>
+                </li>
+            </ul>
+            
+            <div class="d-flex">
+                <button class="btn btn-outline-light me-2" onclick="toggleActuaryMode()">
+                    <i class="fas fa-user-tie"></i> 精算师模式
+                </button>
+                <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#helpModal">
+                    <i class="fas fa-question-circle"></i> 帮助
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">平台使用指南</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>欢迎使用精算分析平台！本平台提供以下主要功能：</p>
+                <ol>
+                    <li><strong>数据管道</strong>：导入和清洗数据</li>
+                    <li><strong>疫情分析</strong>：运行精算模型和分析</li>
+                    <li><strong>结果对比</strong>：比较不同分析结果</li>
+                </ol>
+                <p>首次使用建议点击"<i class="fas fa-user-tie"></i> 精算师模式"开启专业功能。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
