@@ -1,0 +1,259 @@
+<div class="row">
+  <div class="col-lg-4">
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">模型选择</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label">选择模型类型</label>
+          <select class="form-select" id="modelType">
+            <option value="mortality">死亡率模型</option>
+            <option value="morbidity">发病率模型</option>
+            <option value="lapse">退保率模型</option>
+            <option value="custom">自定义模型</option>
+          </select>
+        </div>
+        
+        <div id="standardModels">
+          <div class="mb-3">
+            <label class="form-label">选择标准模型</label>
+            <select class="form-select" id="standardModelSelect">
+              <option value="gompertz">Gompertz模型</option>
+              <option value="makeham">Makeham模型</option>
+              <option value="weibull">Weibull模型</option>
+              <option value="lee-carter">Lee-Carter模型</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">模型描述</label>
+            <div class="alert alert-info py-2 small" id="modelDescription">
+              Gompertz模型是一种常用的死亡率模型，适用于成年人群的死亡率建模。
+            </div>
+          </div>
+        </div>
+        
+        <div id="customModelOptions" style="display: none;">
+          <div class="mb-3">
+            <label class="form-label">模型名称</label>
+            <input type="text" class="form-control" id="customModelName" placeholder="输入自定义模型名称">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">模型公式</label>
+            <textarea class="form-control" id="customModelFormula" rows="3" placeholder="例如: a + b * exp(c * x)"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">参数设置</label>
+            <div id="parameterInputs">
+              <div class="input-group mb-2">
+                <span class="input-group-text">a</span>
+                <input type="number" class="form-control" placeholder="初始值" step="0.001">
+                <input type="number" class="form-control" placeholder="下限" step="0.001">
+                <input type="number" class="form-control" placeholder="上限" step="0.001">
+              </div>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary mt-1" onclick="addParameter()">
+              <i class="fas fa-plus me-1"></i>添加参数
+            </button>
+          </div>
+        </div>
+        
+        <div class="actuary-only" style="display: none;">
+          <div class="mb-3">
+            <label class="form-label">高级选项</label>
+            <select class="form-select" id="advancedOptions">
+              <option value="none">无</option>
+              <option value="randomEffects">随机效应</option>
+              <option value="smoothing">平滑处理</option>
+              <option value="cohortEffects">队列效应</option>
+            </select>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary w-100" id="selectModelBtn">
+          <i class="fas fa-check me-2"></i>选择模型
+        </button>
+      </div>
+    </div>
+    
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">数据集选择</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label">选择数据集</label>
+          <select class="form-select" id="datasetSelect">
+            <option value="">加载中...</option>
+          </select>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">变量映射</label>
+          <div id="variableMapping">
+            <div class="row mb-2">
+              <div class="col-5">
+                <small class="text-muted">模型变量</small>
+              </div>
+              <div class="col-7">
+                <small class="text-muted">数据集字段</small>
+              </div>
+            </div>
+            <!-- 变量映射行将通过JS动态添加 -->
+          </div>
+        </div>
+        
+        <button class="btn btn-primary w-100" id="loadDatasetBtn" disabled>
+          <i class="fas fa-database me-2"></i>加载数据集
+        </button>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">分析控制</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label">分析方法</label>
+          <select class="form-select" id="analysisMethod">
+            <option value="full">完整分析</option>
+            <option value="quick">快速分析</option>
+            <option value="sensitivity">敏感性分析</option>
+          </select>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">结果输出选项</label>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="outputEstimates" checked>
+            <label class="form-check-label" for="outputEstimates">参数估计</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="outputGoodness" checked>
+            <label class="form-check-label" for="outputGoodness">拟合优度</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="outputCharts" checked>
+            <label class="form-check-label" for="outputCharts">图表</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="outputDiagnostics">
+            <label class="form-check-label" for="outputDiagnostics">诊断信息</label>
+          </div>
+        </div>
+        
+        <button class="btn btn-success w-100" id="runAnalysisBtn" disabled>
+          <i class="fas fa-play me-2"></i>运行分析
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">分析结果</h5>
+        <div>
+          <button class="btn btn-sm btn-outline-light me-2" id="exportResultsBtn" disabled>
+            <i class="fas fa-download me-1"></i>导出
+          </button>
+          <button class="btn btn-sm btn-outline-light" id="saveToComparisonBtn" disabled>
+            <i class="fas fa-balance-scale me-1"></i>保存到对比
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <ul class="nav nav-tabs" id="resultsTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="estimates-tab" data-bs-toggle="tab" data-bs-target="#estimates" type="button">参数估计</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="goodness-tab" data-bs-toggle="tab" data-bs-target="#goodness" type="button">拟合优度</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="charts-tab" data-bs-toggle="tab" data-bs-target="#charts" type="button">图表</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="diagnostics-tab" data-bs-toggle="tab" data-bs-target="#diagnostics" type="button">诊断信息</button>
+          </li>
+        </ul>
+        <div class="tab-content py-3" id="resultsTabsContent">
+          <div class="tab-pane fade show active" id="estimates" role="tabpanel">
+            <div class="alert alert-info" id="noEstimatesMessage">
+              请先运行分析以查看参数估计结果。
+            </div>
+            <div id="estimatesContent" style="display: none;"></div>
+          </div>
+          <div class="tab-pane fade" id="goodness" role="tabpanel">
+            <div class="alert alert-info">
+              请先运行分析以查看拟合优度结果。
+            </div>
+          </div>
+          <div class="tab-pane fade" id="charts" role="tabpanel">
+            <div class="alert alert-info">
+              请先运行分析以查看图表。
+            </div>
+          </div>
+          <div class="tab-pane fade" id="diagnostics" role="tabpanel">
+            <div class="alert alert-info">
+              请先运行分析以查看诊断信息。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">代码生成</h5>
+      </div>
+      <div class="card-body">
+        <ul class="nav nav-pills mb-3" id="codeTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="r-tab" data-bs-toggle="pill" data-bs-target="#r-code" type="button">R代码</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="python-tab" data-bs-toggle="pill" data-bs-target="#python-code" type="button">Python代码</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="sas-tab" data-bs-toggle="pill" data-bs-target="#sas-code" type="button">SAS代码</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="codeTabsContent">
+          <div class="tab-pane fade show active" id="r-code" role="tabpanel">
+            <pre><code class="language-r" id="rCode"># 请先运行分析以生成R代码</code></pre>
+          </div>
+          <div class="tab-pane fade" id="python-code" role="tabpanel">
+            <pre><code class="language-python" id="pythonCode"># 请先运行分析以生成Python代码</code></pre>
+          </div>
+          <div class="tab-pane fade" id="sas-code" role="tabpanel">
+            <pre><code class="language-sas" id="sasCode">* 请先运行分析以生成SAS代码;</code></pre>
+          </div>
+        </div>
+        <button class="btn btn-outline-primary mt-3" id="copyCodeBtn" disabled>
+          <i class="fas fa-copy me-1"></i>复制代码
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Model Description Modal -->
+<div class="modal fade" id="modelDescriptionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modelDescriptionModalTitle">模型详情</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modelDescriptionModalBody">
+        <!-- 内容将通过JS动态加载 -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">选择此模型</button>
+      </div>
+    </div>
+  </div>
+</div>
