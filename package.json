@@ -1,0 +1,17 @@
+{
+    "name": "Decrement---analysis",
+    "version": "1.0.0",
+    "description": "Frontend for Actuarial Analysis Platform",
+    "scripts": {
+        "start": "live-server --port=3000"
+    },
+    "dependencies": {
+        "bootstrap": "^5.3.0",
+        "jquery": "^3.6.0",
+        "plotly.js": "^2.14.0",
+        "font-awesome": "^6.4.0"
+    },
+    "devDependencies": {
+        "live-server": "^1.2.2"
+    }
+}
