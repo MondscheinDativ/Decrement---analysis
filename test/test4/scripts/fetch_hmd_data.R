@@ -1,6 +1,6 @@
 library(HMDHFDplus)
 library(readr)
-library(httr)
+library(dplyr)
 
 # 安全凭证获取函数
 get_hmd_credentials <- function() {
@@ -8,7 +8,7 @@ get_hmd_credentials <- function() {
   username <- Sys.getenv("HMD_USERNAME")
   password <- Sys.getenv("HMD_PASSWORD")
   
-  if (!is.null(username) && nchar(username) > 0 && 
+  if (!is.null(username) && nchar(username) > 0 &&
       !is.null(password) && nchar(password) > 0) {
     return(list(username = username, password = password))
   }
@@ -51,8 +51,13 @@ fetch_hmd_data <- function() {
            Age %in% c(20, 25, 30, 60, 80, 84)) %>%
     select(Year, Age, Female, Male, Total)
   
+  # 创建数据目录
+  if (!dir.exists("../data")) {
+    dir.create("../data", recursive = TRUE)
+  }
+  
   # 保存为CSV
-  write_csv(filtered_data, "hmd_usa_2015-2023.csv")
+  write_csv(filtered_data, "../data/hmd_usa_2015-2023.csv")
   
   # 生成数据摘要
   summary_data <- filtered_data %>%
@@ -63,7 +68,7 @@ fetch_hmd_data <- function() {
       Max_Year = max(Year)
     )
   
-  write_csv(summary_data, "hmd_summary.csv")
+  write_csv(summary_data, "../data/hmd_summary.csv")
 }
 
 # 执行数据获取
