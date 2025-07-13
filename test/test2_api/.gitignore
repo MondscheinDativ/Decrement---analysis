@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.env
+
+# Logs
+*.log
+*.log.*
+
+# Test artifacts
+test_reports/
+*.html
+*.xml
+
+# Data files
+*.csv
+*.xlsx
+*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
