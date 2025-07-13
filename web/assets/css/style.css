@@ -1,0 +1,189 @@
+:root {
+  --primary: #2c3e50; /* 深蓝 - 专业感 */
+  --secondary: #f1c40f; /* 金色 - 精算象征 */
+  --accent: #3a7bd5; /* 主色蓝 */
+  --danger: #e74c3c; /* 警报红 */
+  --success: #27ae60; /* 成功绿 */
+  --light: #ecf0f1; /* 浅背景 */
+  --dark: #34495e; /* 深文本 */
+  --text-light: #ffffff; /* 浅色文本 */
+  --border-radius: 8px;
+  --transition: all 0.3s ease;
+}
+
+/* 深色模式 */
+[data-theme="dark"] {
+  --primary: #3498db;
+  --light: #2c3e50;
+  --dark: #ecf0f1;
+  --text-light: #34495e;
+}
+
+/* 基础样式 */
+body {
+  background-color: var(--light);
+  color: var(--dark);
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  padding-top: 70px; /* 导航栏高度 */
+}
+
+/* 导航栏 */
+.navbar {
+  background-color: var(--primary) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: var(--transition);
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.nav-link {
+  font-weight: 500;
+  position: relative;
+  padding: 0.5rem 1rem !important;
+}
+
+.nav-link:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--secondary);
+  transition: var(--transition);
+  transform: translateX(-50%);
+}
+
+.nav-link:hover:after,
+.nav-link.active:after {
+  width: 70%;
+}
+
+/* 卡片样式 */
+.card {
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
+  margin-bottom: 1.5rem;
+  background-color: var(--text-light);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: var(--primary);
+  color: var(--text-light);
+  border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+}
+
+/* 按钮样式 */
+.btn-primary {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  transition: var(--transition);
+}
+
+.btn-primary:hover {
+  background-color: #285d9e;
+  border-color: #285d9e;
+  transform: translateY(-2px);
+}
+
+.btn-outline-light {
+  border-width: 2px;
+  font-weight: 500;
+}
+
+/* 表单控件 */
+.form-control, .form-select {
+  border-radius: var(--border-radius);
+  border: 1px solid #ced4da;
+  padding: 0.5rem 0.75rem;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.25rem rgba(58, 123, 213, 0.25);
+}
+
+/* 精算师模式特定样式 */
+.actuary-mode {
+  --primary: #1a5276;
+  --secondary: #f39c12;
+}
+
+.actuary-only {
+  display: none;
+}
+
+body.actuary-mode .actuary-only {
+  display: block;
+}
+
+/* 诊断卡片 */
+.diagnostic-card {
+  border-left: 4px solid var(--accent);
+  padding-left: 1rem;
+}
+
+.diagnostic-warning {
+  border-left-color: var(--warning);
+}
+
+.diagnostic-danger {
+  border-left-color: var(--danger);
+}
+
+/* 图表容器 */
+.chart-container {
+  width: 100%;
+  height: 400px;
+  margin-bottom: 1.5rem;
+}
+
+/* 页脚样式 */
+footer {
+  background-color: var(--dark);
+  color: var(--light);
+  padding: 1.5rem 0;
+  margin-top: 3rem;
+}
+
+/* 加载动画 */
+#loading-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+}
+
+/* 响应式调整 */
+@media (max-width: 992px) {
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  .navbar-collapse {
+    background-color: var(--primary);
+    padding: 1rem;
+    margin-top: 0.5rem;
+    border-radius: var(--border-radius);
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 60px;
+  }
+  
+  .chart-container {
+    height: 300px;
+  }
+}
