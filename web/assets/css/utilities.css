@@ -1,0 +1,52 @@
+/* 布局工具类 */
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 间距工具类 */
+.mt-6 {
+  margin-top: 4rem !important;
+}
+
+.px-6 {
+  padding-left: 4rem !important;
+  padding-right: 4rem !important;
+}
+
+/* 文本工具类 */
+.text-accent {
+  color: var(--accent) !important;
+}
+
+.text-secondary {
+  color: var(--secondary) !important;
+}
+
+.text-small {
+  font-size: 0.85rem;
+}
+
+/* 动画类 */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+/* 卡片特殊状态 */
+.card-highlight {
+  border: 2px solid var(--secondary);
+  box-shadow: 0 0 15px rgba(243, 156, 18, 0.3);
+}
