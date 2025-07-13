@@ -1,0 +1,72 @@
+{
+  "data": [
+    {
+      "name": "20-39",
+      "x": [2020, 2021, 2022],
+      "y": [0.001234, 0.001345, 0.001456],
+      "mode": "lines+markers",
+      "line": {"width": 2}
+    },
+    {
+      "name": "20-39 CI",
+      "x": [2020, 2021, 2022],
+      "y": [0.001456, 0.001567, 0.001678],
+      "mode": "lines",
+      "line": {"width": 0},
+      "showlegend": false
+    },
+    {
+      "name": "20-39 CI",
+      "x": [2020, 2021, 2022],
+      "y": [0.001012, 0.001123, 0.001234],
+      "mode": "lines",
+      "line": {"width": 0},
+      "fill": "tonexty",
+      "fillcolor": "rgba(68, 68, 68, 0.1)",
+      "showlegend": false
+    },
+    {
+      "name": "40-59",
+      "x": [2020, 2021, 2022],
+      "y": [0.002345, 0.002456, 0.002567],
+      "mode": "lines+markers",
+      "line": {"width": 2}
+    },
+    {
+      "name": "40-59 CI",
+      "x": [2020, 2021, 2022],
+      "y": [0.002567, 0.002678, 0.002789],
+      "mode": "lines",
+      "line": {"width": 0},
+      "showlegend": false
+    },
+    {
+      "name": "40-59 CI",
+      "x": [2020, 2021, 2022],
+      "y": [0.002123, 0.002234, 0.002345],
+      "mode": "lines",
+      "line": {"width": 0},
+      "fill": "tonexty",
+      "fillcolor": "rgba(68, 68, 68, 0.1)",
+      "showlegend": false
+    }
+  ],
+  "layout": {
+    "title": "死亡率趋势分析",
+    "xaxis": {"title": "年份"},
+    "yaxis": {"title": "死亡率", "tickformat": ".4f"},
+    "hovermode": "x unified",
+    "showlegend": true,
+    "annotations": [
+      {
+        "text": "数据来源: 手动创建测试数据",
+        "xref": "paper",
+        "yref": "paper",
+        "x": 1,
+        "y": -0.2,
+        "showarrow": false,
+        "font": {"size": 10}
+      }
+    ]
+  }
+}
