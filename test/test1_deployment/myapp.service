@@ -1,0 +1,13 @@
+[Unit]
+Description=My WebApp Container
+After=network.target
+
+[Service]
+Type=simple
+User=admin
+ExecStart=/usr/bin/podman run --name myapp -p 5000:5000 my-web-app
+ExecStop=/usr/bin/podman stop myapp
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
