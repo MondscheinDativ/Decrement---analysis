@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>精算可视化测试</title>
+    <script src="https://cdn.plot.ly/plotly-2.14.0.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            width: 100%;
+            height: 600px;
+            margin: 0 auto;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>精算可视化测试</h1>
+        <div id="mortalityChart" class="chart-container"></div>
+        
+        <div class="footer">
+            <p>测试生成时间: 2025-07-17 | 环境: Alibaba Cloud Linux 3</p>
+        </div>
+    </div>
+    
+    <script>
+        // 加载配置并渲染图表
+        fetch('viz_config.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP错误! 状态: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(config => {
+                // 渲染图表
+                Plotly.newPlot('mortalityChart', config.data, config.layout);
+                
+                // 添加成功日志
+                console.log("✅ 图表渲染成功");
+                
+                // 更新页面状态
+                document.getElementById('status').textContent = "✅ 图表渲染成功";
+            })
+            .catch(error => {
+                // 处理错误
+                console.error("❌ 图表渲染失败:", error);
+                
+                // 显示错误信息
+                const chartDiv = document.getElementById('mortalityChart');
+                chartDiv.innerHTML = `
+                    <div style="color: red; text-align: center; padding: 50px;">
+                        <h2>图表渲染失败</h2>
+                        <p>${error.message}</p>
+                        <p>请检查控制台获取详细信息</p>
+                    </div>
+                `;
+                
+                // 更新页面状态
+                document.getElementById('status').textContent = "❌ 图表渲染失败";
+            });
+            
+        // 添加状态指示器
+        const statusIndicator = document.createElement('div');
+        statusIndicator.id = 'status';
+        statusIndicator.style.position = 'fixed';
+        statusIndicator.style.top = '10px';
+        statusIndicator.style.right = '10px';
+        statusIndicator.style.padding = '10px';
+        statusIndicator.style.background = 'rgba(0,0,0,0.7)';
+        statusIndicator.style.color = 'white';
+        statusIndicator.style.borderRadius = '4px';
+        statusIndicator.textContent = "正在加载图表...";
+        document.body.appendChild(statusIndicator);
+    </script>
+</body>
+</html>
