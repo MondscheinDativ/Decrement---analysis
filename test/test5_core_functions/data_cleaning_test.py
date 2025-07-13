@@ -2,52 +2,48 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-def generate_clinical_trial_data(n=1000):
-    """生成符合生物统计特性的临床试验数据"""
-    np.random.seed(1751996090)
+def test_cleaning(seed):
+    np.random.seed(seed)
+    
+    # 生成模拟数据
     data = pd.DataFrame({
-        'age': np.random.randint(18, 90, n),
-        'gender': np.random.choice(['M', 'F'], n),
-        'baseline_score': np.clip(np.random.normal(50, 10, n), 30, 70),
-        'final_score': np.clip(np.random.normal(60, 12, n), 40, 80),
+        'value': np.clip(np.random.normal(50, 10, 1000), 30, 70)
     })
     
-    # 添加缺失值
-    missing_mask = np.random.choice([True, False], n, p=[0.2, 0.8])
-    data.loc[missing_mask, 'final_score'] = np.nan
+    # 添加20%缺失值
+    missing_mask = np.random.choice([True, False], 1000, p=[0.2, 0.8])
+    data.loc[missing_mask, 'value'] = np.nan
+    original = data['value'].dropna()
     
-    return data
-
-def test_cleaning_methods():
-    """测试三种缺失值处理方法"""
-    data = generate_clinical_trial_data()
-    original = data['final_score'].dropna()
+    # 测试三种方法
+    methods = {
+        '删除法': data['value'].dropna(),
+        '均值填充': data['value'].fillna(data['value'].mean()),
+        '中位数填充': data['value'].fillna(data['value'].median())
+    }
     
-    # 删除法
-    deleted = data['final_score'].dropna()
-    
-    # 均值填充
-    mean_filled = data['final_score'].fillna(data['final_score'].mean())
-    
-    # 中位数填充
-    median_filled = data['final_score'].fillna(data['final_score'].median())
-    
-    # KS检验
-    ks_deleted = stats.kstest(deleted, original).pvalue
-    ks_mean = stats.kstest(mean_filled, original).pvalue
-    ks_median = stats.kstest(median_filled, original).pvalue
+    # 评估指标
+    results = []
+    for name, method_data in methods.items():
+        ks_test = stats.kstest(method_data, original)
+        mean_shift = abs(method_data.mean() - original.mean())
+        
+        results.append({
+            'Method': name,
+            'Samples': len(method_data),
+            'KS_pvalue': ks_test.pvalue,
+            'Mean_Shift': mean_shift
+        })
     
     # 保存结果
-    results = pd.DataFrame({
-        'Method': ['Deletion', 'Mean Imputation', 'Median Imputation'],
-        'Samples': [len(deleted), len(mean_filled), len(median_filled)],
-        'KS_pvalue': [ks_deleted, ks_mean, ks_median],
-        'Mean_Shift': [
-            abs(deleted.mean() - original.mean()),
-            abs(mean_filled.mean() - original.mean()),
-            abs(median_filled.mean() - original.mean())
-        ]
-    })
+    result_df = pd.DataFrame(results)
+    result_df.to_csv("../test_outputs/cleaning_results.csv", index=False)
     
-    results.to_csv('../test_outputs/cleaning_results.csv', index=False)
-    return results
+    # 找出最佳方法
+    best_method = result_df.loc[result_df['KS_pvalue'].idxmax()]
+    print(f"最佳方法: {best_method['Method']} (KS p值={best_method['KS_pvalue']:.2f})")
+    
+    return {
+        'best_method': best_method['Method'],
+        'best_ks': best_method['KS_pvalue']
+    }
