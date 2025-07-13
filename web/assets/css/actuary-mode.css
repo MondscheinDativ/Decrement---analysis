@@ -1,0 +1,77 @@
+/* 精算师模式专用样式 */
+body.actuary-mode {
+  background-color: #1e2a38;
+}
+
+body.actuary-mode .card {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  border: 1px solid #4a6278;
+}
+
+body.actuary-mode .table {
+  color: #ecf0f1;
+}
+
+body.actuary-mode .table-striped>tbody>tr:nth-of-type(odd) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.actuary-mode .form-control,
+body.actuary-mode .form-select {
+  background-color: #34495e;
+  color: #ecf0f1;
+  border-color: #4a6278;
+}
+
+/* 精算师专用工具提示 */
+.actuary-tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  border-bottom: 1px dashed var(--secondary);
+}
+
+.actuary-tooltip .tooltip-text {
+  visibility: hidden;
+  width: 300px;
+  background-color: var(--dark);
+  color: var(--text-light);
+  text-align: center;
+  border-radius: 6px;
+  padding: 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.actuary-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* 精算师快捷键提示 */
+.shortcut-hint {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--primary);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  display: none;
+}
+
+body.actuary-mode .shortcut-hint {
+  display: block;
+}
