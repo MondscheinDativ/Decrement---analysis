@@ -25,9 +25,15 @@ jobs:
       with:
         r-version: '4.2'
 
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+        
     - name: Install R dependencies
       run: |
-        R -e "install.packages(c('HMDHFDplus', 'readr', 'dplyr', 'httr'), repos = 'https://cloud.r-project.org')"
+        R -e "install.packages(c('remotes', 'httr', 'readr', 'dplyr'), repos = 'https://cloud.r-project.org')"
+        R -e "if (!require('HMDHFDplus')) remotes::install_github('timriffe/HMDHFDplus')"
     
     - name: Fetch HMD data
       run: |
