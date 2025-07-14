@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import requests
 import io
-from datetime import datetime
 
 # CDC数据API端点
 CDC_URL = "https://data.cdc.gov/resource/9bhg-hcku.csv"
@@ -17,31 +16,16 @@ def fetch_cdc_data():
 
     # 获取数据
     try:
-        print("正在请求CDC数据...")
         response = requests.get(CDC_URL, params=params, timeout=30)
-        response.raise_for_status()  # 检查HTTP状态码
-        
-        # 验证响应内容类型
-        if 'csv' not in response.headers.get('Content-Type', ''):
-            raise ValueError(f"Unexpected response type: {response.headers.get('Content-Type')}")
-            
+        response.raise_for_status()
         df = pd.read_csv(io.StringIO(response.text))
-        print(f"成功获取 {len(df)} 条记录")
-        
-    except requests.exceptions.RequestException as e:
-        print(f"网络请求失败: {str(e)}")
-        raise
     except Exception as e:
-        print(f"数据处理失败: {str(e)}")
+        print(f"CDC数据获取失败: {str(e)}")
         raise
-
-    # 确保日期列是datetime类型
-    if 'start_date' in df.columns:
-        df['start_date'] = pd.to_datetime(df['start_date'])
-    else:
-        raise ValueError("数据中缺少 start_date 列")
 
     # 筛选核心数据
+    # 确保日期列转为 datetime 类型再筛选
+    df['start_date'] = pd.to_datetime(df['start_date'])
     filtered_df = df[
         (df['start_date'] >= '2020-01-01') &
         (df['start_date'] <= '2023-12-31') &
@@ -49,34 +33,29 @@ def fetch_cdc_data():
                               '60-64 years', '80-84 years']))
     ]
 
-    # 检查筛选后是否有数据
-    if filtered_df.empty:
-        print("警告: 筛选后没有匹配的数据!")
-    
-    # 创建数据目录（使用绝对路径）
-    data_dir = os.path.join(os.getcwd(), 'data')
+    # 创建数据目录（使用绝对路径确保路径明确）
+    data_dir = os.path.abspath("../data")  # 获取绝对路径
     os.makedirs(data_dir, exist_ok=True)
     
     # 保存为CSV
-    csv_path = os.path.join(data_dir, 'cdc_excess_mortality_2020-2023.csv')
-    filtered_df.to_csv(csv_path, index=False)
-    print(f"数据已保存至: {csv_path}")
-
+    data_file = os.path.join(data_dir, "cdc_excess_mortality_2020-2023.csv")
+    filtered_df.to_csv(data_file, index=False)
+    
     # 生成摘要
-    if not filtered_df.empty:
-        summary = filtered_df.groupby('age_group').agg({
-            'covid_19_deaths': 'sum',
-            'total_deaths': 'sum',
-            'pneumonia_deaths': 'sum'
-        }).reset_index()
-        
-        summary_path = os.path.join(data_dir, 'cdc_summary.csv')
-        summary.to_csv(summary_path, index=False)
-        print(f"摘要已保存至: {summary_path}")
-    else:
-        print("由于没有数据，跳过摘要生成")
+    summary = filtered_df.groupby('age_group').agg({
+        'covid_19_deaths': 'sum',
+        'total_deaths': 'sum',
+        'pneumonia_deaths': 'sum'
+    }).reset_index()
+    
+    summary_file = os.path.join(data_dir, "cdc_summary.csv")
+    summary.to_csv(summary_file, index=False)
 
-    print("CDC数据获取流程完成")
+    print("\n===== 数据文件已生成 =====")
+    print(f"1. 详细数据文件路径：{data_file}")
+    print(f"2. 摘要数据文件路径：{summary_file}")
+    print("在GitHub仓库中，文件位于：data/ 目录下（通过仓库页面直接查看）")
+    print("==========================")
 
 if __name__ == "__main__":
     fetch_cdc_data()
