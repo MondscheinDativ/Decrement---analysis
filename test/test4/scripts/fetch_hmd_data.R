@@ -1,4 +1,13 @@
-library(HMDHFDplus)
+# 确保HMDHFDplus包已安装
+if (!require("HMDHFDplus")) {
+  if (!require("remotes")) {
+    install.packages("remotes", repos = "https://cloud.r-project.org")
+    library(remotes)
+  }
+  remotes::install_github("timriffe/HMDHFDplus")
+  library(HMDHFDplus)
+}
+
 library(readr)
 library(dplyr)
 
@@ -51,16 +60,13 @@ fetch_hmd_data <- function() {
            Age %in% c(20, 25, 30, 60, 80, 84)) %>%
     select(Year, Age, Female, Male, Total)
   
-  # 创建数据目录（使用绝对路径避免相对路径问题）
-  data_dir <- file.path(getwd(), "data")
-  if (!dir.exists(data_dir)) {
-    dir.create(data_dir, recursive = TRUE)
-    message("创建数据目录: ", data_dir)
+  # 创建数据目录
+  if (!dir.exists("../data")) {
+    dir.create("../data", recursive = TRUE, showWarnings = FALSE)
   }
   
   # 保存为CSV
-  write_csv(filtered_data, file.path(data_dir, "hmd_usa_2015-2023.csv"))
-  message("数据已保存至: ", file.path(data_dir, "hmd_usa_2015-2023.csv"))
+  write_csv(filtered_data, "../data/hmd_usa_2015-2023.csv")
   
   # 生成数据摘要
   summary_data <- filtered_data %>%
@@ -71,10 +77,14 @@ fetch_hmd_data <- function() {
       Max_Year = max(Year)
     )
   
-  write_csv(summary_data, file.path(data_dir, "hmd_summary.csv"))
-  message("摘要已保存至: ", file.path(data_dir, "hmd_summary.csv"))
+  write_csv(summary_data, "../data/hmd_summary.csv")
 }
 
 # 执行数据获取
-fetch_hmd_data()
-message("HMD数据获取成功")
+tryCatch({
+  fetch_hmd_data()
+  message("HMD数据获取成功")
+}, error = function(e) {
+  message("HMD数据获取失败: ", e$message)
+  stop(e)
+})
