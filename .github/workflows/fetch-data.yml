@@ -15,11 +15,14 @@ jobs:
       HMD_USERNAME: ${{ secrets.HMD_USERNAME }}
       HMD_PASSWORD: ${{ secrets.HMD_PASSWORD }}
       CDC_API_TOKEN: ${{ secrets.CDC_API_TOKEN }}
-      GITHUB_PAT: ${{ secrets.GH_PAT }}
+      GITHUB_PAT: ${{ secrets.GH_PAT }}  # 确保已设置此Secret
     
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        # 添加fetch-depth参数
+        fetch-depth: 0
 
     - name: Set up R
       uses: r-lib/actions/setup-r@v2
@@ -55,8 +58,22 @@ jobs:
     
     - name: Commit and push data
       run: |
+        # 添加调试信息
+        echo "当前目录内容:"
+        ls -R
+        
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add data/*.csv
+        
+        # 添加文件前先检查
+        if [ -d "test/test4/data" ]; then
+          git add test/test4/data/*.csv
+        elif [ -d "data" ]; then
+          git add data/*.csv
+        else
+          echo "未找到数据目录"
+          exit 1
+        fi
+        
         git commit -m "Auto-update mortality data" || echo "No changes to commit"
         git push
