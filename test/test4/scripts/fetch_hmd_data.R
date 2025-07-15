@@ -37,7 +37,6 @@ get_hmd_credentials <- function() {
   stop("无法获取HMD凭证")
 }
 
-# 主获取函数
 fetch_hmd_data <- function() {
   cred <- get_hmd_credentials()
   
@@ -60,13 +59,14 @@ fetch_hmd_data <- function() {
            Age %in% c(20, 25, 30, 60, 80, 84)) %>%
     select(Year, Age, Female, Male, Total)
   
-  # 创建数据目录
+  # 确保输出目录存在
   if (!dir.exists("../data")) {
     dir.create("../data", recursive = TRUE, showWarnings = FALSE)
   }
   
   # 保存为CSV
-  write_csv(filtered_data, "../data/hmd_usa_2015-2023.csv")
+  hmd_file <- "../data/hmd_usa_2015-2023.csv"
+  write_csv(filtered_data, hmd_file)
   
   # 生成数据摘要
   summary_data <- filtered_data %>%
@@ -77,7 +77,13 @@ fetch_hmd_data <- function() {
       Max_Year = max(Year)
     )
   
-  write_csv(summary_data, "../data/hmd_summary.csv")
+  summary_file <- "../data/hmd_summary.csv"
+  write_csv(summary_data, summary_file)
+  
+  # 输出文件路径
+  message("HMD数据文件已保存到:")
+  message("  ", normalizePath(hmd_file))
+  message("  ", normalizePath(summary_file))
 }
 
 # 执行数据获取
