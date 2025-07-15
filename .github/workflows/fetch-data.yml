@@ -3,10 +3,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 1'  # 每周一00:00 UTC运行
-  push:
-    branches: [main]
-    paths: 
-      - 'test/test4/scripts/**'
 
 jobs:
   fetch-data:
@@ -15,16 +11,10 @@ jobs:
       HMD_USERNAME: ${{ secrets.HMD_USERNAME }}
       HMD_PASSWORD: ${{ secrets.HMD_PASSWORD }}
       CDC_API_TOKEN: ${{ secrets.CDC_API_TOKEN }}
-      GITHUB_PAT: ${{ secrets.GH_PAT }}
     
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-
-    - name: Create data directory
-      run: mkdir -p data
     
     - name: Set up R
       uses: r-lib/actions/setup-r@v2
@@ -58,20 +48,8 @@ jobs:
         pip install pandas requests
         python test/test4/scripts/fetch_cdc_data.py
     
-    - name: Verify data files
-      run: |
-        echo "=== 数据文件检查 ==="
-        ls -lh data/  # 检查根目录的data文件夹
-        echo "==================="
-    
-    - name: Commit and push data
-      run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        
-        # 确保添加根目录data文件夹下的文件
-        git add data/*.csv
-        
-        # 提交更改
-        git commit -m "Auto-update mortality data" || echo "No changes to commit"
-        git push
+    - name: Upload data artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: mortality-data
+        path: data/
