@@ -33,8 +33,8 @@ def fetch_cdc_data():
                               '60-64 years', '80-84 years']))
     ]
 
-   # 创建数据目录
-    data_dir = os.path.abspath("../data")
+    # 创建数据目录（根目录的data文件夹）
+    data_dir = "data"
     os.makedirs(data_dir, exist_ok=True)
     
     # 保存为CSV
@@ -50,8 +50,8 @@ def fetch_cdc_data():
     
     summary_file = os.path.join(data_dir, "cdc_summary.csv")
     summary.to_csv(summary_file, index=False)
-
-    # 打印绝对路径
+    
+    # 打印文件路径
     print("\n===== 数据文件已生成 =====")
     print(f"1. 详细数据文件路径: {os.path.abspath(data_file)}")
     print(f"2. 摘要数据文件路径: {os.path.abspath(summary_file)}")
