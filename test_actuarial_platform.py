@@ -7,18 +7,6 @@ import unittest
 from unittest.mock import patch, MagicMock
 import subprocess
 
-# 创建自定义库路径
-if (!dir.exists("~/R_libs")) {
-  dir.create("~/R_libs")
-}
-# 指定安装包时使用的库路径
-.libPaths("~/R_libs")
-
-# 然后再执行安装包操作
-install.packages("demography", repos = "https://cloud.r-project.org")
-
-# 添加项目根目录到系统路径
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # 模拟精算平台的核心功能
 class ActuarialPlatformTest(unittest.TestCase):
