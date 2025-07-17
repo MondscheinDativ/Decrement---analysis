@@ -2,8 +2,8 @@ name: Test Actuarial Platform
 
 on:
   push:
-    branches: [main]  # 推送到 main 分支时触发
-  workflow_dispatch:  # 允许手动触发
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -13,27 +13,24 @@ jobs:
       - name: 拉取代码
         uses: actions/checkout@v4
 
-      # 安装 R 依赖（解决 demography 包问题）
-      - name: 安装 R 及依赖
+      # 新增：构建并运行 Docker 容器，替换原来的 R 依赖安装步骤
+      - name: 构建并运行测试容器
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y r-base r-base-dev libgfortran5 libcurl4-openssl-dev
-          mkdir -p ~/R_libs
-          R -e 'install.packages("demography", repos = "https://cran.rstudio.com/", lib = "~/R_libs")'
-          echo "R_LIBS_USER=~/R_libs" >> $GITHUB_ENV
+          # 构建 Docker 镜像（会安装 R 和 Python 依赖）
+          docker build -t actuarial-test .
+          # 运行容器并执行测试
+          docker run actuarial-test
 
-      # 安装 Python 依赖
-      - name: 安装 Python 环境
+      # 保留：安装 Python 依赖
+      - name: 安装 Python 依赖
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
-      - name: 安装 Python 依赖
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt  # 读取根目录的 requirements.txt
+          pip install -r requirements.txt
 
-      # 执行测试文件
+      # 保留：执行测试
       - name: 执行测试文件
         run: |
-          pytest test_actuarial_platform.py -v  # 测试文件在根目录
+          pytest test_actuarial_platform.py -v
