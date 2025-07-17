@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actuarial Decrement - 精算减量表分析与预测平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        accent: '#FF7D00',
+                        danger: '#F53F3F',
+                        success: '#00B42A',
+                        neutral: {
+                            100: '#F2F3F5',
+                            200: '#E5E6EB',
+                            300: '#C9CDD4',
+                            400: '#86909C',
+                            500: '#4E5969',
+                            600: '#272E3B',
+                            700: '#1D2129',
+                        }
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                        pingfang: ['PingFang SC', 'Microsoft YaHei', 'sans-serif']
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .btn-primary {
+                @apply bg-primary text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none;
+            }
+            .btn-secondary {
+                @apply bg-white text-primary border border-primary px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-primary/5 focus:ring-2 focus:ring-primary/50 focus:outline-none;
+            }
+            .nav-item {
+                @apply px-4 py-2 rounded-md transition-all duration-200 hover:bg-primary/10 font-medium;
+            }
+            .nav-item.active {
+                @apply bg-primary/10 text-primary;
+            }
+            .metric-card {
+                @apply bg-white dark:bg-neutral-600 rounded-xl p-4 shadow-sm border border-neutral-200 dark:border-neutral-500;
+            }
+            .slider-thumb::-webkit-slider-thumb {
+                @apply appearance-none w-4 h-4 rounded-full bg-primary cursor-pointer;
+            }
+        }
+    </style>
+    <!-- 引入Google字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="font-pingfang bg-gray-50 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-100 transition-colors duration-300">
+    <!-- 顶部导航栏 -->
+    <header class="sticky top-0 z-50 bg-white dark:bg-neutral-800 shadow-sm transition-colors duration-300">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo和项目名称 -->
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fa fa-line-chart text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-primary">Actuarial Decrement</span>
+                    </div>
+                </div>
+
+                <!-- 主导航菜单 - 桌面版 -->
+                <nav class="hidden md:flex space-x-1">
+                    <a href="#dashboard" class="nav-item active">
+                        <i class="fa fa-dashboard mr-1"></i>首页
+                    </a>
+                    <a href="#historical" class="nav-item">
+                        <i class="fa fa-history mr-1"></i>历史分析
+                    </a>
+                    <a href="#lab" class="nav-item">
+                        <i class="fa fa-flask mr-1"></i>模型实验室
+                    </a>
+                    <a href="#sensitivity" class="nav-item">
+                        <i class="fa fa-sliders mr-1"></i>敏感性测试
+                    </a>
+                    <a href="#cases" class="nav-item">
+                        <i class="fa fa-file-text mr-1"></i>案例测试
+                    </a>
+                    <a href="#help" class="nav-item">
+                        <i class="fa fa-question-circle mr-1"></i>帮助文档
+                    </a>
+                </nav>
+
+                <!-- 右侧功能区 -->
+                <div class="flex items-center space-x-4">
+                    <!-- 语言切换 -->
+                    <div class="relative">
+                        <button class="flex items-center px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-neutral-600 transition-colors">
+                            <i class="fa fa-globe mr-1"></i>
+                            <span>中文</span>
+                            <i class="fa fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                    </div>
+
+                    <!-- 主题切换 -->
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-600 transition-colors">
+                        <i class="fa fa-moon-o dark:hidden"></i>
+                        <i class="fa fa-sun-o hidden dark:block"></i>
+                    </button>
+
+                    <!-- 用户登录/注册 -->
+                    <button class="btn-secondary py-2 px-4">
+                        <i class="fa fa-user mr-1"></i>登录
+                    </button>
+
+                    <!-- 移动端菜单按钮 -->
+                    <button type="button" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-neutral-500 hover:text-primary hover:bg-gray-100 dark:hover:bg-neutral-600 focus:outline-none">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 移动端导航菜单 (默认隐藏) -->
+    <div class="md:hidden hidden bg-white dark:bg-neutral-800 shadow-lg absolute w-full z-40 transition-all duration-300">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+            <a href="#dashboard" class="block nav-item active">
+                <i class="fa fa-dashboard mr-1"></i>首页
+            </a>
+            <a href="#historical" class="block nav-item">
+                <i class="fa fa-history mr-1"></i>历史分析
+            </a>
+            <a href="#lab" class="block nav-item">
+                <i class="fa fa-flask mr-1"></i>模型实验室
+            </a>
+            <a href="#sensitivity" class="block nav-item">
+                <i class="fa fa-sliders mr-1"></i>敏感性测试
+            </a>
+            <a href="#cases" class="block nav-item">
+                <i class="fa fa-file-text mr-1"></i>案例测试
+            </a>
+            <a href="#help" class="block nav-item">
+                <i class="fa fa-question-circle mr-1"></i>帮助文档
+            </a>
+        </div>
+    </div>
+
+    <main>
+        <!-- 首页/Landing Page -->
+        <section id="dashboard" class="py-12 md:py-20">
+            <!-- 顶部轮播图 -->
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+                <div class="bg-gradient-to-r from-primary/90 to-primary rounded-2xl overflow-hidden shadow-xl">
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div class="p-8 md:p-12 text-white">
+                            <h1 class="text-[clamp(1.8rem,4vw,2.8rem)] font-bold leading-tight text-shadow mb-4">
+                                精算减量表分析平台
+                            </h1>
+                            <p class="text-[clamp(1rem,2vw,1.2rem)] mb-8 text-white/90 max-w-lg">
+                                基于历史数据与随机模型，为精算师提供专业决策支持，从复杂计算中释放洞察价值
+                            </p>
+                            <div class="flex flex-wrap gap-4">
+                                <button class="bg-white text-primary px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-gray-100">
+                                    <i class="fa fa-rocket mr-2"></i>立即开始
+                                </button>
+                                <button class="bg-transparent border border-white text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-white/10">
+                                    <i class="fa fa-play-circle mr-2"></i>观看演示
+                                </button>
+                            </div>
+                        </div>
+                        <div class="hidden md:block relative h-full">
+                            <img src="https://picsum.photos/id/180/800/500" alt="精算数据分析可视化" class="w-full h-full object-cover opacity-90">
+                            <div class="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 核心价值主张 -->
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+                <div class="text-center max-w-3xl mx-auto mb-12">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.2rem)] font-bold mb-4">我们为什么做这个平台？</h2>
+                    <p class="text-neutral-500 dark:text-neutral-300 text-lg">
+                        精算减量表分析长期面临模型单一化、合规风险高、决策效率低三大痛点。本平台通过构建「精算模型实验室」，实现从历史数据分析到多情景预测的全流程支持。
+                    </p>
+                </div>
+
+                <!-- 三大功能亮点 -->
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- 功能亮点1 -->
+                    <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm p-6 card-hover border border-neutral-200 dark:border-neutral-500">
+                        <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+                            <i class="fa fa-bar-chart text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">历史数据分析</h3>
+                        <p class="text-neutral-500 dark:text-neutral-300">
+                            可视化展示CDC/HMD数据，深入分析疫情冲击等关键事件对死亡率的影响，支持多维度数据筛选与导出。
+                        </p>
+                    </div>
+
+                    <!-- 功能亮点2 -->
+                    <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm p-6 card-hover border border-neutral-200 dark:border-neutral-500">
+                        <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+                            <i class="fa fa-flask text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">模型实验室</h3>
+                        <p class="text-neutral-500 dark:text-neutral-300">
+                            提供Lee-Carter、CBD等多种精算模型，支持随机模拟与预测，满足不同场景下的死亡率分析需求。
+                        </p>
+                    </div>
+
+                    <!-- 功能亮点3 -->
+                    <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm p-6 card-hover border border-neutral-200 dark:border-neutral-500">
+                        <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+                            <i class="fa fa-cogs text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">定制化测试</h3>
+                        <p class="text-neutral-500 dark:text-neutral-300">
+                            支持上传自有数据，进行敏感性测试与情景分析，生成专业诊断报告，辅助精算决策。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 与传统工具的差异 -->
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.2rem)] font-bold mb-4">平台核心优势</h2>
+                    <p class="text-neutral-500 dark:text-neutral-300 max-w-3xl mx-auto">
+                        相比传统分析工具，我们的平台在预测能力、模型验证、合规设计和情景分析四个维度实现了全面升级
+                    </p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full bg-white dark:bg-neutral-600 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-500">
+                        <thead>
+                            <tr class="bg-neutral-50 dark:bg-neutral-700">
+                                <th class="px-6 py-4 text-left font-semibold">功能维度</th>
+                                <th class="px-6 py-4 text-left font-semibold">普通分析工具</th>
+                                <th class="px-6 py-4 text-left font-semibold">本平台</th>
+                                <th class="px-6 py-4 text-left font-semibold">精算价值</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-200 dark:divide-neutral-500">
+                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-500/50 transition-colors">
+                                <td class="px-6 py-4 font-medium">死亡率预测</td>
+                                <td class="px-6 py-4">简单趋势外推</td>
+                                <td class="px-6 py-4">
+                                    <span class="flex items-center text-success">
+                                        <i class="fa fa-check-circle mr-2"></i>随机CBD模拟
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">符合IFRS17要求</td>
+                            </tr>
+                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-500/50 transition-colors">
+                                <td class="px-6 py-4 font-medium">模型验证</td>
+                                <td class="px-6 py-4">无系统验证</td>
+                                <td class="px-6 py-4">
+                                    <span class="flex items-center text-success">
+                                        <i class="fa fa-check-circle mr-2"></i>SOA案例回溯测试
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">确保结果可靠性</td>
+                            </tr>
+                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-500/50 transition-colors">
+                                <td class="px-6 py-4 font-medium">合规设计</td>
+                                <td class="px-6 py-4">基础声明</td>
+                                <td class="px-6 py-4">
+                                    <span class="flex items-center text-success">
+                                        <i class="fa fa-check-circle mr-2"></i>交互式知情确认
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">明确责任边界</td>
+                            </tr>
+                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-500/50 transition-colors">
+                                <td class="px-6 py-4 font-medium">情景分析</td>
+                                <td class="px-6 py-4">静态表格</td>
+                                <td class="px-6 py-4">
+                                    <span class="flex items-center text-success">
+                                        <i class="fa fa-check-circle mr-2"></i>动态参数调节
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">支持极端风险评估</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 快速开始 -->
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-primary/5 dark:bg-primary/10 rounded-2xl p-8 border border-primary/20">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div>
+                            <h2 class="text-2xl md:text-3xl font-bold mb-2">准备好开始使用了吗？</h2>
+                            <p class="text-neutral-600 dark:text-neutral-300 max-w-xl">
+                                立即部署平台，体验专业精算分析工具带来的效率提升
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-4">
+                            <button class="btn-primary">
+                                <i class="fa fa-code-fork mr-2"></i>获取代码
+                            </button>
+                            <button class="btn-secondary">
+                                <i class="fa fa-book mr-2"></i>查看文档
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 历史分析页面 -->
+        <section id="historical" class="py-12 md:py-20 bg-white dark:bg-neutral-800 transition-colors duration-300">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.2rem)] font-bold mb-4">历史数据分析</h2>
+                    <p class="text-neutral-500 dark:text-neutral-300 max-w-3xl mx-auto">
+                        多维度分析历史死亡率数据，直观展示疫情等关键事件的影响，支持自定义筛选与数据导出
+                    </p>
+                </div>
+
+                <div class="grid lg:grid-cols-4 gap-6">
+                    <!-- 左侧筛选面板 -->
+                    <div class="lg:col-span-1 bg-gray-50 dark:bg-neutral-700 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fa fa-filter text-primary mr-2"></i>数据筛选器
+                        </h3>
+
+                        <!-- 国家/地区选择 -->
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium mb-2">国家/地区</label>
+                            <select class="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-500 bg-white dark:bg-neutral-600 focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                                <option value="">请选择国家/地区</option>
+                                <option value="cn">中国</option>
+                                <option value="us">美国</option>
+                                <option value="jp">日本</option>
+                                <option value="uk">英国</option>
+                            </select>
+                        </div>
+
+                        <!-- 时间范围 -->
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium mb-2">时间范围</label>
+                            <div class="px-2">
+                                <input type="range" min="2000" max="2023" value="2010" class="w-full slider-thumb">
+                                <div class="flex justify-between text-xs text-neutral-500 mt-1">
+                                    <span>2000</span>
+                                    <span>2010</span>
+                                    <span>2023</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 年龄组选择 -->
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium mb-2">年龄组</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="rounded text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">0-14岁</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="rounded text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">15-44岁</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="rounded text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">45-64岁</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="rounded text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">65岁以上</span>
+                                </label>
+                            </div>
+                            <div class="mt-2">
+                                <label class="flex items-center text-sm text-primary">
+                                    <input type="checkbox" class="rounded text-primary focus:ring-primary">
+                                    <span class="ml-2">全选</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 性别选择 -->
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium mb-2">性别</label>
+                            <div class="flex space-x-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="gender" class="text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">男</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="gender" class="text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">女</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="gender" checked class="text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">全部</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 指标选择 -->
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium mb-2">指标选择</label>
+                            <select class="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-500 bg-white dark:bg-neutral-600 focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                                <option value="qx">死亡率(qx)</option>
+                                <option value="lx">生存人数(lx)</option>
+                                <option value="dx">死亡人数(dx)</option>
+                                <option value="ex">预期寿命(ex)</option>
+                                <option value="excess">超额死亡率</option>
+                            </select>
+                        </div>
+
+                        <!-- 按钮 -->
+                        <div class="flex space-x-3 mt-6">
+                            <button class="flex-1 bg-primary text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary/90">
+                                <i class="fa fa-search mr-1"></i>查询
+                            </button>
+                            <button class="px-4 py-2 border border-neutral-300 dark:border-neutral-500 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-600 transition-colors">
+                                <i class="fa fa-refresh"></i>
+                            </button>
+                        </div>
+
+                        <!-- 保存/加载配置 -->
+                        <div class="mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-500">
+                            <h4 class="text-sm font-medium mb-3">配置管理</h4>
+                            <div class="flex space-x-3">
+                                <button class="flex-1 text-sm px-3 py-2 border border-neutral-300 dark:border-neutral-500 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-600 transition-colors">
+                                    <i class="fa fa-save mr-1"></i>保存配置
+                                </button>
+                                <button class="flex-1 text-sm px-3 py-2 border border-neutral-300 dark:border-neutral-500 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-600 transition-colors">
+                                    <i class="fa fa-folder-open mr-1"></i>加载
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧图表展示区 -->
+                    <div class="lg:col-span-3">
+                        <!-- 图表标签页 -->
+                        <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm mb-6 overflow-hidden">
+                            <div class="flex border-b border-neutral-200 dark:border-neutral-500">
+                                <button class="px-6 py-3 font-medium text-primary border-b-2 border-primary">
+                                    趋势图
+                                </button>
+                                <button class="px-6 py-3 font-medium text-neutral-500 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-500/50 transition-colors">
+                                    热力图
+                                </button>
+                                <button class="px-6 py-3 font-medium text-neutral-500 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-500/50 transition-colors">
+                                    仪表盘
+                                </button>
+                            </div>
+
+                            <!-- 图表内容 -->
+                            <div class="p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-semibold">分年龄组死亡率变化趋势</h3>
+                                    <div class="flex space-x-2">
+                                        <button class="p-2 text-neutral-500 hover:text-primary hover:bg-gray-100 dark:hover:bg-neutral-500 rounded transition-colors" title="下载图片">
+                                            <i class="fa fa-download"></i>
+                                        </button>
+                                        <button class="p-2 text-neutral-500 hover:text-primary hover:bg-gray-100 dark:hover:bg-neutral-500 rounded transition-colors" title="全屏查看">
+                                            <i class="fa fa-expand"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="h-[400px] bg-gray-50 dark:bg-neutral-700 rounded-lg flex items-center justify-center">
+                                    <canvas id="trendChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 统计摘要 -->
+                        <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm p-6 mb-6">
+                            <h3 class="font-semibold mb-4">统计摘要</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="metric-card">
+                                    <div class="text-sm text-neutral-500 dark:text-neutral-300 mb-1">平均死亡率</div>
+                                    <div class="text-2xl font-bold text-primary">7.24‰</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="text-sm text-neutral-500 dark:text-neutral-300 mb-1">标准差</div>
+                                    <div class="text-2xl font-bold text-primary">1.83‰</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="text-sm text-neutral-500 dark:text-neutral-300 mb-1">最大值</div>
+                                    <div class="text-2xl font-bold text-danger">12.56‰</div>
+                                    <div class="text-xs text-neutral-500 mt-1">2020年</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="text-sm text-neutral-500 dark:text-neutral-300 mb-1">最小值</div>
+                                    <div class="text-2xl font-bold text-success">5.12‰</div>
+                                    <div class="text-xs text-neutral-500 mt-1">2019年</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 数据导出 -->
+                        <div class="flex justify-end">
+                            <button class="btn-secondary">
+                                <i class="fa fa-download mr-2"></i>导出数据 (CSV)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 模型实验室页面 -->
+        <section id="lab" class="py-12 md:py-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.2rem)] font-bold mb-4">模型实验室</h2>
+                    <p class="text-neutral-500 dark:text-neutral-300 max-w-3xl mx-auto">
+                        提供多种精算模型进行死亡率预测，支持参数自定义与多模型对比，助力精算分析决策
+                    </p>
+                </div>
+
+                <!-- 免责声明 -->
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-8">
+                    <div class="flex items-start">
+                        <i class="fa fa-info-circle text-yellow-500 mt-0.5 mr-3 text-lg"></i>
+                        <div>
+                            <h4 class="font-medium text-yellow-800 dark:text-yellow-300">使用提示</h4>
+                            <p class="text-sm text-yellow-700 dark:text-yellow-400">
+                                本功能为学术演示，不作为精算依据。所有输出需经SOA Formula 743校准，使用者须确认理解模型假设。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <!-- 左侧模型选择和参数设置 -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <!-- 模型选择器 -->
+                        <div class="bg-white dark:bg-neutral-600 rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-4 flex items-center">
+                                <i class="fa fa-cubes text-primary mr-2"></i>模型选择
+                            </h3>
+
+                            <div class="space-y-3">
+                                <label class="flex items-center p-3 border border-neutral-200 dark:border-neutral-500 rounded-lg cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-500/50 transition-colors">
+                                    <input type="radio" name="model" class="text-primary focus:ring-primary" checked>
+                                    <div class="ml-3">
+                                        <div class="font-medium">Lee-Carter模型</div>
+                                        <div class="text-sm text-neutral-500 dark:text-neutral-300">基础死亡率预测模型</div>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center p-3 border border-neutral-200 dark:border-neutral-500 rounded-lg cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-500/50 transition-colors">
+                                    <input type="radio" name="model" class="text-primary focus:ring-primary">
+                                    <div class="ml-3">
+                                        <div class="font-medium">CBD模型</div>
+                                        <div class="text-sm text-neutral-500 dark:text-neutral-300">随机死亡率模拟模型</div>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center p-3 border border-neutral-200 dark:border-neutral-500 rounded-lg cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-500/50 transition-colors">
+                                    <input type="radio" name="model" class="text-primary focus:ring-primary">
+                                    <div class="ml-3">
+                                        <div class="font-medium">APC模型</div>
+                                        <div class="text-sm text-neutral-500 dark:text-neutral-300">年龄-时期-队列模型</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="mt-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="rounded text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">多模型对比（最多3个）</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 参数设置 -->
+                        <div class="bg-white dark:bg-neutral-600 rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold mb-4 flex items-center">
+                                <i class="fa fa-sliders text-primary mr-2"></i>参数设置
+                            </h3>
+
+                            <!-- 预测年限 -->
+                            <div class="mb-5">
+                                <div class="flex justify-between mb-2">
+                                    <label class="text-sm font-medium">预测年限</label>
+                                    <span class="text-sm text-primary font-medium" id="years-value">5年</span>
+                                </div>
+                                <input type="range" min="1" max="10" value="5" class="w-full slider-thumb" id="years-slider">
+                                <div class="flex justify-between text-xs text-neutral-500 mt-1">
+                                    <span>1年</span>
+                                    <span>10年</span>
+                                </div>
+                            </div>
+
+                            <!-- 置信水平 -->
+                            <div class="mb-5">
+                                <label class="block text-sm font-medium mb-2">置信水平</label>
+                                <select class="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-500 bg-white dark:bg-neutral-600 focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                                    <option value="90">90% (CAS标准)</option>
+                                    <option value="95" selected>95% (SOA标准)</option>
+                                    <option value="99">99% (Solvency II)</option>
+                                </select>
+                            </div>
+
+                            <!-- 随机模拟次数 -->
+                            <div class="mb-5">
+                                <label class="block text-sm font-medium mb-2">随机模拟次数</label>
+                                <select class="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-500 bg-white dark:bg-neutral-600 focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                                    <option value="500">500次</option>
+                                    <option value="1000" selected>1000次</option>
+                                    <option value="2000">2000次</option>
+                                </select>
+                            </div>
+
+                            <!-- 数据源选择 -->
+                            <div class="mb-5">
+                                <label class="block text-sm font-medium mb-2">数据源选择</label>
+                                <div class="space-y-3">
+                                    <label class="flex items-center p-3 border border-neutral-200 dark:border-neutral-500 rounded-lg cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-500/50 transition-colors">
+                                        <input type="radio" name="data-source" class="text-primary focus:ring-primary" checked>
+                                        <span class="ml-2">使用平台数据</span>
+                                    </label>
+                                    <label class="flex items-center p-3 border border-neutral-200 dark:border-neutral-500 rounded-lg cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-500/50 transition-colors">
+                                        <input type="radio" name="data-source" class="text-primary focus:ring-primary">
+                                        <span class="ml-2">上传自有数据</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 免责声明和运行按钮 -->
+                        <div class="bg-white dark:bg-neutral-600 rounded-xl p-6 shadow-sm">
+                            <div class="mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                                <h4 class="font-medium text-primary text-sm mb-2">免责声明</h4>
+                                <p class="text-xs text-neutral-600 dark:text-neutral-300 mb-3">
+                                    本工具符合教育标准但不替代持证签字，所有输出需经SOA Formula 743校准。
+                                </p>
+                                <label class="flex items-center text-xs">
+                                    <input type="checkbox" class="rounded text-primary focus:ring-primary" required>
+                                    <span class="ml-2">我已阅读并理解上述条款</span>
+                                </label>
+                            </div>
+
+                            <button class="w-full btn-primary">
+                                <i class="fa fa-play mr-2"></i>开始预测
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 右侧结果展示区 -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- 预测结果可视化 -->
+                        <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-semibold">预测结果可视化</h3>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 text-neutral-500 hover:text-primary hover:bg-gray-100 dark:hover:bg-neutral-500 rounded transition-colors" title="下载图片">
+                                        <i class="fa fa-download"></i>
+                                    </button>
+                                    <button class="p-2 text-neutral-500 hover:text-primary hover:bg-gray-100 dark:hover:bg-neutral-500 rounded transition-colors" title="全屏查看">
+                                        <i class="fa fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">年龄组选择</label>
+                                <select class="w-full md:w-auto px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-500 bg-white dark:bg-neutral-600 focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+                                    <option value="all">全部年龄组</option>
+                                    <option value="0-14">0-14岁</option>
+                                    <option value="15-44">15-44岁</option>
+                                    <option value="45-64">45-64岁</option>
+                                    <option value="65+">65岁以上</option>
+                                </select>
+                            </div>
+
+                            <div class="h-[400px] bg-gray-50 dark:bg-neutral-700 rounded-lg flex items-center justify-center">
+                                <canvas id="forecastChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- 模型诊断报告 -->
+                        <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm p-6">
+                            <h3 class="font-semibold mb-4">模型诊断报告</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <div class="metric-card">
+                                    <div class="text-sm text-neutral-500 dark:text-neutral-300 mb-1">AIC值</div>
+                                    <div class="text-2xl font-bold text-primary">743.2</div>
+                                    <div class="text-xs text-success mt-1">基准: < 750</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="text-sm text-neutral-500 dark:text-neutral-300 mb-1">残差自相关</div>
+                                    <div class="text-2xl font-bold text-primary">0.12</div>
+                                    <div class="text-xs text-success mt-1">基准: < 0.2</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="text-sm text-neutral-500 dark:text-neutral-300 mb-1">回溯测试准确率</div>
+                                    <div class="text-2xl font-bold text-primary">92%</div>
+                                    <div class="text-xs text-success mt-1">基准: > 85%</div>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-gray-50 dark:bg-neutral-700 rounded-lg border border-neutral-200 dark:border-neutral-500">
+                                <h4 class="font-medium mb-2">模型评估与建议</h4>
+                                <p class="text-sm text-neutral-600 dark:text-neutral-300">
+                                    模型整体拟合效果良好，AIC值和残差自相关均优于基准水平。回溯测试准确率达到92%，表明模型对历史数据有较好的解释力。
+                                    <br><br>
+                                    建议：对于长期预测（>5年），可考虑使用CBD模型进行随机模拟，以更好地捕捉未来死亡率的不确定性。
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 结果导出 -->
+                        <div class="flex justify-end">
+                            <button class="btn-secondary">
+                                <i class="fa fa-download mr-2"></i>导出结果 (Excel)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 敏感性测试页面 -->
+        <section id="sensitivity" class="py-12 md:py-20 bg-white dark:bg-neutral-800 transition-colors duration-300">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.2rem)] font-bold mb-4">敏感性测试</h2>
+                    <p class="text-neutral-500 dark:text-neutral-300 max-w-3xl mx-auto">
+                        调整关键参数观察对预测结果的影响，支持多情景对比分析，助力精算风险评估
+                    </p>
+                </div>
+
+                <div class="grid lg:grid-cols-12 gap-6">
+                    <!-- 左侧控制面板 -->
+                    <div class="lg:col-span-3 bg-gray-50 dark:bg-neutral-700 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fa fa-sliders text-primary mr-2"></i>情景与参数控制
+                        </h3>
+
+                        <!-- 情景选择 -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">情景选择</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center p-2 border border-neutral-200 dark:border-neutral-500 rounded-lg cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors">
+                                    <input type="radio" name="scenario" class="text-primary focus:ring-primary" checked>
+                                    <span class="ml-2 text-sm">基准情景（历史趋势）</span>
+                                </label>
+                                <label class="flex items-center p-2 border border-neutral-200 dark:border-neutral-500 rounded-lg cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors">
+                                    <input type="radio" name="scenario" class="text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">疫情延续情景</span>
+                                </label>
+                                <label class="flex items-center p-2 border border-neutral-200 dark:border-neutral-500 rounded-lg cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors">
+                                    <input type="radio" name="scenario" class="text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">二次爆发情景</span>
+                                </label>
+                                <label class="flex items-center p-2 border border-neutral-200 dark:border-neutral-500 rounded-lg cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors">
+                                    <input type="radio" name="scenario" class="text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">自定义情景</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 参数调节器 -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">疫情冲击强度</label>
+                            <div class="px-2">
+                                <input type="range" min="0.8" max="1.5" step="0.1" value="1.0" class="w-full slider-thumb">
+                                <div class="flex justify-between text-xs text-neutral-500 mt-1">
+                                    <span>0.8x</span>
+                                    <span>1.0x</span>
+                                    <span>1.5x</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 尾部效应 -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">尾部效应</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="radio" name="tail-effect" class="text-primary focus:ring-primary" checked>
+                                    <span class="ml-2 text-sm">短期（1-2年）</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="tail-effect" class="text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">中期（3-5年）</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="tail-effect" class="text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm">永久影响</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 自定义参数 -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">年龄组调整系数</label>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span>0-14岁</span>
+                                        <span>1.00</span>
+                                    </div>
+                                    <input type="range" min="0.5" max="1.5" step="0.05" value="1.0" class="w-full slider-thumb">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span>15-44岁</span>
+                                        <span>1.00</span>
+                                    </div>
+                                    <input type="range" min="0.5" max="1.5" step="0.05" value="1.0" class="w-full slider-thumb">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span>45-64岁</span>
+                                        <span>1.20</span>
+                                    </div>
+                                    <input type="range" min="0.5" max="1.5" step="0.05" value="1.2" class="w-full slider-thumb">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span>65岁以上</span>
+                                        <span>1.30</span>
+                                    </div>
+                                    <input type="range" min="0.5" max="1.5" step="0.05" value="1.3" class="w-full slider-thumb">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 按钮 -->
+                        <button class="w-full btn-primary">
+                            <i class="fa fa-refresh mr-2"></i>更新结果
+                        </button>
+                    </div>
+
+                    <!-- 中间图表区 -->
+                    <div class="lg:col-span-6 space-y-6">
+                        <!-- 图表展示 -->
+                        <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-semibold">多情景对比分析</h3>
+                                <div class="flex space-x-2">
+                                    <div class="flex items-center">
+                                        <label class="text-sm mr-2">图表类型:</label>
+                                        <select class="text-sm px-2 py-1 rounded border border-neutral-300 dark:border-neutral-500 bg-white dark:bg-neutral-600">
+                                            <option>折线图</option>
+                                            <option>柱状图</option>
+                                            <option>面积图</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="h-[400px] bg-gray-50 dark:bg-neutral-700 rounded-lg flex items-center justify-center">
+                                <canvas id="sensitivityChart"></canvas>
+                            </div>
+
+                            <!-- 情景选择器 -->
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <label class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary/10 text-primary border border-primary/20">
+                                    <input type="checkbox" checked class="mr-1">
+                                    基准情景
+                                </label>
+                                <label class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-accent/10 text-accent border border-accent/20">
+                                    <input type="checkbox" checked class="mr-1">
+                                    疫情延续
+                                </label>
+                                <label class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-danger/10 text-danger border border-danger/20">
+                                    <input type="checkbox" checked class="mr-1">
+                                    二次爆发
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧结果摘要 -->
+                    <div class="lg:col-span-3 space-y-6">
+                        <!-- 关键指标变化 -->
+                        <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm p-6">
+                            <h3 class="font-semibold mb-4">关键指标变化</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="border-b border-neutral-200 dark:border-neutral-500">
+                                            <th class="text-left py-2">指标</th>
+                                            <th class="text-right py-2">基准值</th>
+                                            <th class="text-right py-2">变化率</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-neutral-200 dark:divide-neutral-500">
+                                        <tr>
+                                            <td class="py-2">总死亡率</td>
+                                            <td class="py-2 text-right">7.24‰</td>
+                                            <td class="py-2 text-right text-danger">+12.3%</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2">预期寿命</td>
+                                            <td class="py-2 text-right">77.3岁</td>
+                                            <td class="py-2 text-right text-danger">-1.8岁</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2">年金准备金</td>
+                                            <td class="py-2 text-right">¥2.46亿</td>
+                                            <td class="py-2 text-right text-danger">+8.7%</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2">寿险赔付成本</td>
+                                            <td class="py-2 text-right">¥1.83亿</td>
+                                            <td class="py-2 text-right text-danger">+15.2%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 生成报告 -->
+                        <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm p-6">
+                            <h3 class="font-semibold mb-4">报告生成</h3>
+                            <p class="text-sm text-neutral-500 dark:text-neutral-300 mb-4">
+                                生成详细的敏感性测试报告，包含图表和分析结论
+                            </p>
+                            <button class="w-full btn-primary">
+                                <i class="fa fa-file-pdf-o mr-2"></i>生成PDF报告
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 案例测试页面 -->
+        <section id="cases" class="py-12 md:py-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.2rem)] font-bold mb-4">案例测试</h2>
+                    <p class="text-neutral-500 dark:text-neutral-300 max-w-3xl mx-auto">
+                        提供精算领域标准案例，帮助用户熟悉平台功能，验证模型效果，支持考试级案例练习
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- 案例卡片1 -->
+                    <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm overflow-hidden card-hover border border-neutral-200 dark:border-neutral-500">
+                        <div class="h-40 bg-gray-200 dark:bg-neutral-500 relative">
+                            <img src="https://picsum.photos/id/237/600/400" alt="疫情对年金产品的影响" class="w-full h-full object-cover">
+                            <div class="absolute top-3 left-3 bg-primary text-white text-xs px-2 py-1 rounded-full">
+                                SOA认证案例
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold mb-2">疫情对年金产品的影响</h3>
+                            <p class="text-sm text-neutral-500 dark:text-neutral-300 mb-4">
+                                分析COVID-19疫情对年金产品定价和准备金评估的影响，包含死亡率冲击模型。
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <div class="text-xs text-neutral-500">
+                                    <i class="fa fa-clock-o mr-1"></i>完成时间: 30分钟
+                                </div>
+                                <button class="text-primary text-sm font-medium hover:underline">
+                                    运行案例 <i class="fa fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 案例卡片2 -->
+                    <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm overflow-hidden card-hover border border-neutral-200 dark:border-neutral-500">
+                        <div class="h-40 bg-gray-200 dark:bg-neutral-500 relative">
+                            <img src="https://picsum.photos/id/239/600/400" alt="长寿风险建模" class="w-full h-full object-cover">
+                            <div class="absolute top-3 left-3 bg-primary text-white text-xs px-2 py-1 rounded-full">
+                                考试级案例
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold mb-2">长寿风险建模与评估</h3>
+                            <p class="text-sm text-neutral-500 dark:text-neutral-300 mb-4">
+                                使用Lee-Carter和CBD模型预测未来寿命趋势，评估长寿风险对养老金计划的影响。
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <div class="text-xs text-neutral-500">
+                                    <i class="fa fa-clock-o mr-1"></i>完成时间: 45分钟
+                                </div>
+                                <button class="text-primary text-sm font-medium hover:underline">
+                                    运行案例 <i class="fa fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 案例卡片3 -->
+                    <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm overflow-hidden card-hover border border-neutral-200 dark:border-neutral-500">
+                        <div class="h-40 bg-gray-200 dark:bg-neutral-500 relative">
+                            <img src="https://picsum.photos/id/240/600/400" alt="极端事件对减量表的冲击" class="w-full h-full object-cover">
+                            <div class="absolute top-3 left-3 bg-accent text-white text-xs px-2 py-1 rounded-full">
+                                高级案例
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold mb-2">极端事件对减量表的冲击</h3>
+                            <p class="text-sm text-neutral-500 dark:text-neutral-300 mb-4">
+                                模拟重大公共卫生事件对死亡率表的长期影响，评估尾部风险和极端情景。
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <div class="text-xs text-neutral-500">
+                                    <i class="fa fa-clock-o mr-1"></i>完成时间: 60分钟
+                                </div>
+                                <button class="text-primary text-sm font-medium hover:underline">
+                                    运行案例 <i class="fa fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 案例卡片4 -->
+                    <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm overflow-hidden card-hover border border-neutral-200 dark:border-neutral-500">
+                        <div class="h-40 bg-gray-200 dark:bg-neutral-500 relative">
+                            <img src="https://picsum.photos/id/241/600/400" alt="IFRS 17下的负债评估" class="w-full h-full object-cover">
+                            <div class="absolute top-3 left-3 bg-primary text-white text-xs px-2 py-1 rounded-full">
+                                合规案例
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold mb-2">IFRS 17下的负债评估</h3>
+                            <p class="text-sm text-neutral-500 dark:text-neutral-300 mb-4">
+                                基于IFRS 17准则，使用随机死亡率模型评估寿险合同负债，包含折现率影响分析。
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <div class="text-xs text-neutral-500">
+                                    <i class="fa fa-clock-o mr-1"></i>完成时间: 50分钟
+                                </div>
+                                <button class="text-primary text-sm font-medium hover:underline">
+                                    运行案例 <i class="fa fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 案例卡片5 -->
+                    <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm overflow-hidden card-hover border border-neutral-200 dark:border-neutral-500">
+                        <div class="h-40 bg-gray-200 dark:bg-neutral-500 relative">
+                            <img src="https://picsum.photos/id/242/600/400" alt="养老金计划风险评估" class="w-full h-full object-cover">
+                            <div class="absolute top-3 left-3 bg-success text-white text-xs px-2 py-1 rounded-full">
+                                实务案例
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold mb-2">养老金计划风险评估</h3>
+                            <p class="text-sm text-neutral-500 dark:text-neutral-300 mb-4">
+                                评估DB型养老金计划的长寿风险和利率风险，进行资产负债匹配分析。
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <div class="text-xs text-neutral-500">
+                                    <i class="fa fa-clock-o mr-1"></i>完成时间: 55分钟
+                                </div>
+                                <button class="text-primary text-sm font-medium hover:underline">
+                                    运行案例 <i class="fa fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 案例卡片6 -->
+                    <div class="bg-white dark:bg-neutral-600 rounded-xl shadow-sm overflow-hidden card-hover border border-neutral-200 dark:border-neutral-500 flex items-center justify-center p-6 h-[300px]">
+                        <button class="text-center text-primary hover:text-primary/80 transition-colors">
+                            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fa fa-plus text-2xl text-primary"></i>
+                            </div>
+                            <div class="font-medium">添加自定义案例</div>
+                            <div class="text-sm mt-1">上传您的案例数据和配置</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 帮助文档页面 -->
+        <section id="help" class="py-12 md:py-20 bg-white dark:bg-neutral-800 transition-colors duration-300">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.2rem)] font-bold mb-4">帮助文档</h2>
+                    <p class="text-neutral-500 dark:text-neutral-300 max-w-3xl mx-auto">
+                        详细的使用指南和模型说明，帮助您快速掌握平台功能，充分发挥精算分析能力
+                    </p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- 左侧导航 -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-gray-50 dark:bg-neutral-700 rounded-xl p-6 shadow-sm sticky top-24">
+                            <h3 class="text-lg font-semibold mb-4">文档目录</h3>
+                            <nav class="space-y-1">
+                                <a href="#" class="block px-3 py-2 rounded-md bg-primary/10 text-primary text-sm font-medium">
+                                    平台入门
+                                </a>
+                                <a href="#" class="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-neutral-600 text-sm">
+                                    历史数据分析
+                                </a>
+                                <a href="#" class="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-neutral-600 text-sm">
+                                    模型实验室使用
+                                </a>
+                                <a href="#" class="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-neutral-600 text-sm">
+                                    敏感性测试指南
+                                </a>
+                                <a href="#" class="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-neutral-600 text-sm">
+                                    案例测试说明
+                                </a>
+                                <a href="#" class="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-neutral-600 text-sm">
+                                    精算模型详解
+                                </a>
+                                <a href="#" class="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-neutral-600 text-sm">
+                                    数据上传与管理
+                                </a>
+                                <a href="#" class="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-neutral-600 text-sm">
