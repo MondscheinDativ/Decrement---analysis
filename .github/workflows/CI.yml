@@ -1,0 +1,44 @@
+name: R and Python CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install R and dependencies
+        run: |
+          # 安装系统依赖（Ubuntu 环境下）
+          sudo apt update
+          sudo apt install -y r-base
+
+          # 创建自定义 R 包安装路径
+          mkdir -p ~/R_libs
+          # 安装 demography 包及依赖
+          R -e 'install.packages("demography", repos = "https://cloud.r-project.org", lib = "~/R_libs", dependencies = TRUE)'
+          # 配置 R 包查找路径
+          echo "R_LIBS_USER=~/R_libs" >> $GITHUB_ENV
+
+      - name: Install Python dependencies
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Python tests
+        run: |
+          pytest tests/  # 执行 Python 测试，根据实际调整
+
+      - name: Run R scripts 
+        run: |
+          # 运行 R 脚本，确保脚本里加载包时能找到路径
+          Rscript your_r_script.R
