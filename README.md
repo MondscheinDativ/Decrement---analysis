@@ -28,7 +28,7 @@ graph TD
 ```
 
 
-🖥 专业可视化系统
+🖥 专业可视化系统  
 三屏交互体系
 
 ```mermaid
@@ -63,7 +63,7 @@ graph TB
 
 
 
-🧪 核心创新：精算模型实验室
+🧪 核心创新：精算模型实验室  
 独特的三阶预测框架
 
 ```mermaid
@@ -96,21 +96,25 @@ graph LR
 | 合规设计     | 基础声明           | ✅ 交互式知情确认      | 明确责任边界             |
 | 情景分析     | 静态表格           | ✅ 动态参数调节        | 支持极端风险评估         |
 
-核心代码实现
-python
-运行
+核心代码实现  
+### 核心代码实现
+
+```python
 def actuarial_forecast(data):
     # 第一阶段：Python实现Lee-Carter基础预测
     lc_forecast = lee_carter_base(data)
-    
+
     # 第二阶段：R实现CBD随机模拟（通过rpy2集成）
     with rpy2.robjects.packages.importr('StMoMo'):
         cbd_sim = r('cbd_simulation(n = 1000)')  # 1000次随机模拟
-    
+
     # 第三阶段：SOA标准校准
     return soa_calibration(lc_forecast, cbd_sim)
+```
+
 模型诊断面板
-html
+
+```html
 预览
 <div class="diagnostic-report">
   <h6>模型拟合诊断</h6>
@@ -120,25 +124,46 @@ html
     <metric-card title="回溯测试准确率" value="92%" benchmark=">85%"></metric-card>
   </div>
 </div>
-⚙️ 快速体验预测功能
-通过 SOA 案例启动
-bash
-# 加载SOA 2023真题数据集
-python load_soa_case.py --exam=spring2023 --question=5
+```
 
-# 启动预测沙箱
+⚙️ 快速体验预测功能  
+通过 SOA 案例启动  
+### 模型诊断面板 HTML 预览  
+
+#### 模型拟合诊断  
+- 快速体验预测功能：通过 SOA 案例启动    
+
+```bash
+# 加载 SOA 2023 真题数据集
+python load_soa_case.py --exam=spring2023 --question=5
+```
+
+### 启动预测沙箱
+
+```r
 Rscript -e "shiny::runApp('model_lab')"
-预测工作流
-选择对比模型（Lee-Carter/CBD/APC）
-设置精算参数：
-yaml
+```
+
+预测工作流  
+选择对比模型  
+Lee-Carter  
+CBD  
+APC  
+
+### 设置精算参数（YAML 格式）  
+
+```yaml
 time_horizon: 5  # 预测年限
 confidence_level: 95  # SOA标准置信水平
 n_simulations: 1000  # 随机模拟次数
-执行回溯测试验证准确性
-导出压力测试报告
-🖥️ 网页功能模块
-整体架构
+```
+
+执行回溯测试验证准确性  
+导出压力测试报告  
+
+
+🖥️ 网页功能模块  
+整体架构  
 
 ```mermaid
 graph TD
@@ -158,13 +183,15 @@ graph TD
 ```
 
 
-关键页面功能
-1. 历史分析页面
-多维度筛选：国家 / 地区、时间范围、年龄组、性别
-可视化形式：趋势线图、年龄 - 年份热力图、疫情冲击分析
+关键页面功能  
+1. 历史分析页面  
+多维度筛选：国家 / 地区、时间范围、年龄组、性别  
+可视化形式：趋势线图、年龄 - 年份热力图、疫情冲击分析  
 数据操作：支持 CSV 导出、自定义指标计算
-2. 模型实验室页面
-html
+
+2. 模型实验室页面  
+
+```html
 预览
 <div class="model-lab">
   <!-- 模型选择器 -->
@@ -187,20 +214,24 @@ html
     </select>
   </div>
 </div>
-3. 敏感性测试页面
-三栏布局：控制面板 → 图表区 → 结果摘要
-情景选择：基准 / 疫情延续 / 二次爆发 / 自定义
-参数调节：冲击强度 (0.8-1.5)、尾部效应类型、年龄组系数
+```
+
+3. 敏感性测试页面  
+三栏布局：控制面板 → 图表区 → 结果摘要  
+情景选择：基准 / 疫情延续 / 二次爆发 / 自定义  
+参数调节：冲击强度 (0.8-1.5)、尾部效应类型、年龄组系数  
 实时输出：准备金影响百分比、死亡率曲线偏移、PDF 报告生成
-4. 案例测试页面
-内置 5 + 标准案例：
-疫情对年金产品的影响分析
-长寿风险建模与评估
-极端事件对减量表的冲击
+
+4. 案例测试页面  
+内置 5 + 标准案例：  
+疫情对年金产品的影响分析  
+长寿风险建模与评估  
+极端事件对减量表的冲击  
 一键运行：自动加载数据并生成对比报告
-🚀 快速开始
-本地部署
-bash
+
+🚀 快速开始  
+本地部署  
+```bash
 # 克隆仓库
 git clone https://github.com/MondscheinDativ/Actuarial-Decrement.git
 cd actuarial-decrement
@@ -214,9 +245,12 @@ python app.py  # 后端服务，默认端口5000
 # 同时启动前端（新终端）
 cd frontend && npm start  # 前端服务，默认端口3000
 访问地址：http://localhost:3000
-📜 专业免责系统
-法律声明集成
-html
+```
+
+📜 专业免责系统  
+法律声明集成  
+
+```html
 预览
 <div class="disclaimer-card">
   <h5><i class="fa-solid fa-scale-balanced"></i> 精算预测使用规范</h5>
@@ -230,13 +264,16 @@ html
     <label for="disclaimer-agree">确认理解并接受上述条款</label>
   </div>
 </div>
-🌐 可视化设计规范
-精算专业配色系统
-用途	色值	示例
-基准数据	#3498db	<div style="background:#3498db;width:50px;height:20px;"></div>
-预测区间	#f39c12	<div style="background:#f39c12;width:50px;height:20px;"></div>
-风险预警	#e74c3c	<div style="background:#e74c3c;width:50px;height:20px;"></div>
-SOA 标准	#2c3e50	<div style="background:#2c3e50;width:50px;height:20px;"></div>
+```
+
+🌐 可视化设计规范  
+精算专业配色系统  
+| 用途       | 色值      | 示例展示                                                                 |
+|------------|-----------|--------------------------------------------------------------------------|
+| 基准数据   | #3498db   | <div style="background-color:#3498db;width:50px;height:20px;"></div>     |
+| 预测区间   | #f39c12   | <div style="background-color:#f39c12;width:50px;height:20px;"></div>     |
+| 风险预警   | #e74c3c   | <div style="background-color:#e74c3c;width:50px;height:20px;"></div>     |
+| SOA 标准   | #2c3e50   | <div style="background-color:#2c3e50;width:50px;height:20px;"></div>     |
 
 响应式布局方案
 
@@ -251,12 +288,12 @@ flowchart LR
 ```
 
 
-项目愿景
-精算师的核心价值不在于复杂的计算，而在于对风险本质的洞察。本平台通过自动化重复性工作，让精算师能专注于：
-极端风险的识别与评估
-模型假设的合理性判断
-业务场景的深度解读
-"工具的终极目标是让专业人士回归思考本身"
+项目愿景  
+精算师的核心价值不在于复杂的计算，而在于对风险本质的洞察。本平台通过自动化重复性工作，让精算师能专注于：  
+极端风险的识别与评估  
+模型假设的合理性判断  
+业务场景的深度解读  
+"工具的终极目标是让专业人士回归思考本身"  
 
 ### 📅 产品迭代路线图（即将上线）
 
@@ -280,12 +317,11 @@ flowchart LR
 - **社区贡献机制** 👥 规划中  
   开放模型提交通道，建立贡献者认证体系
 
-> 注：标有✅/⚡/🔍的功能预计30天内发布，📚/👥功能将在下次迭代中上线
 
 "工具的进化方向，是让精算师的专业判断更聚焦于风险本质"—— Actuarial Decrement 核心设计理念
 
 
-项目维护频率：每周
-联系方式：GitHub
-最后更新：2025 年 7 月
+项目维护频率：每周  
+联系方式：GitHub  
+最后更新：2025 年 7 月  
 开源协议：MIT（核心代码） + GPLv3（R/Python 依赖库）
