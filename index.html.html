@@ -74,92 +74,87 @@
 <body class="font-pingfang bg-gray-50 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-100 transition-colors duration-300">
     <!-- 顶部导航栏 -->
     <header class="sticky top-0 z-50 bg-white dark:bg-neutral-800 shadow-sm transition-colors duration-300">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Logo和项目名称 -->
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <i class="fa fa-line-chart text-primary text-2xl mr-2"></i>
-                        <span class="text-xl font-bold text-primary">Actuarial Decrement</span>
-                    </div>
-                </div>
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 主容器：Logo + 导航 + 右侧功能 -->
+        <div class="flex flex-col md:flex-row items-center justify-between h-20">
+          <!-- 左侧：Logo区域 -->
+          <div class="flex items-center md:mr-8">
+            <i class="fa fa-line-chart text-primary text-2xl mr-2"></i>
+            <span class="text-xl font-bold text-primary">Actuarial Decrement</span>
+          </div>
 
-                <!-- 主导航菜单 - 桌面版 -->
-                <nav class="hidden md:flex space-x-1">
-                    <a href="#dashboard" class="nav-item active">
-                        <i class="fa fa-dashboard mr-1"></i>首页
-                    </a>
-                    <a href="#historical" class="nav-item">
-                        <i class="fa fa-history mr-1"></i>历史分析
-                    </a>
-                    <a href="#lab" class="nav-item">
-                        <i class="fa fa-flask mr-1"></i>模型实验室
-                    </a>
-                    <a href="#sensitivity" class="nav-item">
-                        <i class="fa fa-sliders mr-1"></i>敏感性测试
-                    </a>
-                    <a href="#cases" class="nav-item">
-                        <i class="fa fa-file-text mr-1"></i>案例测试
-                    </a>
-                    <a href="#help" class="nav-item">
-                        <i class="fa fa-question-circle mr-1"></i>帮助文档
-                    </a>
-                </nav>
-
-                <!-- 右侧功能区 -->
-                <div class="flex items-center space-x-4">
-                    <!-- 语言切换 -->
-                    <div class="relative">
-                        <button class="flex items-center px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-neutral-600 transition-colors">
-                            <i class="fa fa-globe mr-1"></i>
-                            <span>中文</span>
-                            <i class="fa fa-chevron-down text-xs ml-1"></i>
-                        </button>
-                    </div>
-
-                    <!-- 主题切换 -->
-                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-600 transition-colors">
-                        <i class="fa fa-moon-o dark:hidden"></i>
-                        <i class="fa fa-sun-o hidden dark:block"></i>
-                    </button>
-
-                    <!-- 用户登录/注册 -->
-                    <button class="btn-secondary py-2 px-4">
-                        <i class="fa fa-user mr-1"></i>登录
-                    </button>
-
-                    <!-- 移动端菜单按钮 -->
-                    <button type="button" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-neutral-500 hover:text-primary hover:bg-gray-100 dark:hover:bg-neutral-600 focus:outline-none">
-                        <i class="fa fa-bars text-xl"></i>
-                    </button>
-                </div>
+          <!-- 中间：导航菜单（拆分移动端/桌面端逻辑） -->
+          <nav class="flex-grow md:flex md:items-center md:justify-center md:space-x-4">
+            <!-- 桌面端导航 -->
+            <div class="hidden md:flex space-x-2">
+              <a href="#dashboard" class="nav-item active">首页</a>
+              <a href="#historical" class="nav-item">历史分析</a>
+              <a href="#lab" class="nav-item">模型实验室</a>
+              <a href="#sensitivity" class="nav-item">敏感性测试</a>
+              <a href="#cases" class="nav-item">案例测试</a>
+              <a href="#help" class="nav-item">帮助文档</a>
             </div>
+
+            <!-- 移动端导航按钮（点击展开） -->
+            <button 
+              type="button" 
+              class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-neutral-500 hover:text-primary hover:bg-gray-100 dark:hover:bg-neutral-600 focus:outline-none"
+              id="mobile-nav-toggle"
+            >
+              <i class="fa fa-bars text-xl"></i>
+            </button>
+          </nav>
+
+          <!-- 右侧：功能区（语言、主题、登录） -->
+          <div class="flex items-center md:ml-8 space-x-4">
+            <!-- 语言切换 -->
+            <div class="relative">
+              <button class="flex items-center px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-neutral-600 transition-colors">
+                <i class="fa fa-globe mr-1"></i>
+                <span>中文</span>
+                <i class="fa fa-chevron-down text-xs ml-1"></i>
+              </button>
+            </div>
+
+            <!-- 主题切换 -->
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-600 transition-colors">
+              <i class="fa fa-moon-o dark:hidden"></i>
+              <i class="fa fa-sun-o hidden dark:block"></i>
+            </button>
+
+            <!-- 登录按钮 -->
+            <button class="btn-secondary py-2 px-4">
+              <i class="fa fa-user mr-1"></i>登录
+            </button>
+          </div>
         </div>
+      </div>
+
+      <!-- 移动端导航菜单（默认隐藏，点击展开） -->
+      <div 
+        class="md:hidden hidden bg-white dark:bg-neutral-800 shadow-lg absolute w-full z-40 transition-all duration-300" 
+        id="mobile-nav-menu"
+      >
+        <div class="px-4 pt-4 pb-6 space-y-2">
+          <a href="#dashboard" class="block nav-item active">首页</a>
+          <a href="#historical" class="block nav-item">历史分析</a>
+          <a href="#lab" class="block nav-item">模型实验室</a>
+          <a href="#sensitivity" class="block nav-item">敏感性测试</a>
+          <a href="#cases" class="block nav-item">案例测试</a>
+          <a href="#help" class="block nav-item">帮助文档</a>
+        </div>
+      </div>
     </header>
 
-    <!-- 移动端导航菜单 (默认隐藏) -->
-    <div class="md:hidden hidden bg-white dark:bg-neutral-800 shadow-lg absolute w-full z-40 transition-all duration-300">
-        <div class="px-2 pt-2 pb-3 space-y-1">
-            <a href="#dashboard" class="block nav-item active">
-                <i class="fa fa-dashboard mr-1"></i>首页
-            </a>
-            <a href="#historical" class="block nav-item">
-                <i class="fa fa-history mr-1"></i>历史分析
-            </a>
-            <a href="#lab" class="block nav-item">
-                <i class="fa fa-flask mr-1"></i>模型实验室
-            </a>
-            <a href="#sensitivity" class="block nav-item">
-                <i class="fa fa-sliders mr-1"></i>敏感性测试
-            </a>
-            <a href="#cases" class="block nav-item">
-                <i class="fa fa-file-text mr-1"></i>案例测试
-            </a>
-            <a href="#help" class="block nav-item">
-                <i class="fa fa-question-circle mr-1"></i>帮助文档
-            </a>
-        </div>
-    </div>
+    <!-- 新增：移动端导航展开逻辑（纯JS，无需依赖框架） -->
+    <script>
+      const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+      const mobileNavMenu = document.getElementById('mobile-nav-menu');
+
+      mobileNavToggle.addEventListener('click', () => {
+        mobileNavMenu.classList.toggle('hidden');
+      });
+    </script>
 
     <main>
         <!-- 首页/Landing Page -->
