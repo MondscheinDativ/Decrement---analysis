@@ -1,0 +1,36 @@
+name: R and Python CI
+
+on:
+  push:
+    branches:
+      - main  # 代码推送到 main 分支时触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # 拉取代码到运行环境
+
+      - name: Install R and dependencies
+        run: |
+          # 安装 R 环境、创建自定义库路径、安装 demography 包
+          sudo apt update
+          sudo apt install -y r-base
+          mkdir -p ~/R_libs
+          R -e 'install.packages("demography", repos = "https://cloud.r-project.org", lib = "~/R_libs")'
+          echo "R_LIBS_USER=~/R_libs" >> $GITHUB_ENV  # 配置 R 包路径
+
+      - name: Install Python dependencies
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt  # 安装 Python 依赖
+
+      - name: Run test_actuarial_platform.py
+        run: |
+          pytest tests/test_actuarial_platform.py
+            # 执行 Python 测试代码
