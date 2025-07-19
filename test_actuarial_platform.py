@@ -103,8 +103,8 @@ class ActuarialPlatformTest(unittest.TestCase):
         if 2019 not in self.hmd_data['year'].values or 2020 not in self.hmd_data['year'].values:
             self.skipTest("缺少2019或2020年数据")
 
-        baseline = self.hmd_data.loc[self.hmd_data['year']==2019, 'mortality_rate'].iloc[0]
-        pandemic_rate = self.hmd_data.loc[self.hmd_data['year']==2020, 'mortality_rate'].iloc[0]
+        baseline = self.hmd_data.loc[self.hmd_data['year'] == 2019, 'mortality_rate'].iloc[0]
+        pandemic_rate = self.hmd_data.loc[self.hmd_data['year'] == 2020, 'mortality_rate'].iloc[0]
         impact = (pandemic_rate - baseline) / baseline
 
         self.assertGreater(impact, 0.15, f"2020年疫情冲击不足: {impact:.2%}")
@@ -270,4 +270,3 @@ if __name__ == '__main__':
     with open("test_report.json", "w") as f:
         json.dump(report, f, indent=2)
     print("\n测试报告已保存至 test_report.json")
-    
