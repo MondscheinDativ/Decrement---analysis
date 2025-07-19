@@ -4,14 +4,32 @@ import json
 import pandas as pd
 import numpy as np
 import unittest
-from unittest.mock import patch, MagicMock
 import subprocess
 
 
-# 模拟精算平台的核心功能
 class ActuarialPlatformTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        # === 模拟 setup-r@v2 行为，创建用户级 R 库 并 安装 demography 包 ===
+        user_r_lib = os.path.expanduser(os.path.join("~", "R", "library"))
+        os.makedirs(user_r_lib, exist_ok=True)
+        os.environ["R_LIBS_USER"] = user_r_lib
+
+        # 安装 demography（如果已经安装，会自动跳过）
+        try:
+            subprocess.run(
+                ["Rscript", "-e",
+                 'if (!"demography" %in% installed.packages()[,1]) '
+                 'install.packages("demography", repos="https://cloud.r-project.org")'],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                env=os.environ
+            )
+            print(f"✅ R 包 demography 安装到用户库: {user_r_lib}")
+        except subprocess.CalledProcessError as e:
+            print(f"⚠️ 安装 demography 失败，但继续执行测试: {e}")
+
         # 加载测试数据（包含疫情年份）
         cls.hmd_data = cls.load_hmd_data()
         cls.cdc_data = cls.load_cdc_data()
@@ -44,13 +62,10 @@ class ActuarialPlatformTest(unittest.TestCase):
     def load_hmd_data():
         """加载HMD死亡率数据（包含疫情年份）"""
         try:
-            # 使用实际文件路径
             hmd_path = "data/HMD_raw_data.txt"
-            # 假设文件是制表符分隔
             return pd.read_csv(hmd_path, delimiter='\t')
         except Exception as e:
-            print(f"加载HMD数据失败: {str(e)}")
-            # 回退到模拟数据
+            print(f"加载HMD数据失败: {e}")
             return pd.DataFrame({
                 'year': [2018, 2019, 2020, 2021, 2022, 2023],
                 'age': [65, 66, 67, 68, 69, 70],
@@ -61,12 +76,10 @@ class ActuarialPlatformTest(unittest.TestCase):
     def load_cdc_data():
         """加载CDC超额死亡率数据（包含疫情年份）"""
         try:
-            # 使用实际文件路径
             cdc_path = "data/CDC_raw_data.csv"
             return pd.read_csv(cdc_path)
         except Exception as e:
-            print(f"加载CDC数据失败: {str(e)}")
-            # 回退到模拟数据
+            print(f"加载CDC数据失败: {e}")
             return pd.DataFrame({
                 'year': [2018, 2019, 2020, 2021, 2022, 2023],
                 'excess_mortality': [0.02, 0.025, 0.15, 0.10, 0.06, 0.03]
@@ -76,80 +89,51 @@ class ActuarialPlatformTest(unittest.TestCase):
         """测试数据加载功能（包含疫情数据）"""
         self.assertFalse(self.hmd_data.empty, "HMD数据加载失败")
         self.assertFalse(self.cdc_data.empty, "CDC数据加载失败")
-        
-        # 验证数据包含必要列
         self.assertIn('year', self.hmd_data.columns, "HMD数据缺少year列")
         self.assertIn('mortality_rate', self.hmd_data.columns, "HMD数据缺少mortality_rate列")
-        
-        # 验证疫情年份数据存在
+
         if 2020 in self.hmd_data['year'].values:
             print("✅ 检测到疫情年份数据")
         else:
             print("⚠️ 未检测到疫情年份数据，使用模拟数据")
-        
         print("✅ 数据加载测试通过")
 
     def test_pandemic_impact_analysis(self):
         """测试疫情冲击分析功能"""
-        # 确保有2019和2020年数据
         if 2019 not in self.hmd_data['year'].values or 2020 not in self.hmd_data['year'].values:
             self.skipTest("缺少2019或2020年数据")
-        
-        # 计算基线死亡率（2019年）
-        baseline = self.hmd_data[self.hmd_data['year'] == 2019]['mortality_rate'].values[0]
-        
-        # 计算2020年疫情冲击
-        pandemic_rate = self.hmd_data[self.hmd_data['year'] == 2020]['mortality_rate'].values[0]
+
+        baseline = self.hmd_data.loc[self.hmd_data['year']==2019, 'mortality_rate'].iloc[0]
+        pandemic_rate = self.hmd_data.loc[self.hmd_data['year']==2020, 'mortality_rate'].iloc[0]
         impact = (pandemic_rate - baseline) / baseline
-        
-        # 放宽冲击幅度容忍度（15%）
-        self.assertGreater(
-            impact, 
-            0.15, 
-            f"2020年疫情冲击不足: {impact:.2%}"
-        )
-        
+
+        self.assertGreater(impact, 0.15, f"2020年疫情冲击不足: {impact:.2%}")
         print(f"✅ 疫情冲击分析测试通过: 2020年冲击 = {impact:.2%}")
 
     def test_mortality_analysis_with_pandemic(self):
         """测试包含疫情影响的死亡率分析"""
         for model_id, model_info in self.models.items():
             with self.subTest(model=model_id):
-                # 运行模型分析
                 results = self.run_analysis(model_id, self.hmd_data)
-                
-                # 验证结果结构
                 self.assertIn('parameters', results, "缺少参数估计结果")
                 self.assertIn('forecast', results, "缺少预测结果")
-                
-                # 验证模型处理疫情的能力
                 if "lee-carter" in model_id:
-                    # Lee-Carter模型应有疫情调整参数
-                    self.assertIn('pandemic_adjustment', results['parameters'], "缺少疫情调整参数")
-                
+                    self.assertIn('pandemic_adjustment', results['parameters'],
+                                  "缺少疫情调整参数")
                 print(f"✅ {model_info['name']} 分析测试通过")
 
     def test_r_vs_python_comparison(self):
         """测试R和Python模型实现的等效性"""
-        # 获取Python实现的Lee-Carter结果
         py_results = self.run_analysis("lee-carter", self.hmd_data)
-        
-        # 获取R实现的Lee-Carter结果
         r_results = self.run_analysis("r-lee-carter", self.hmd_data)
-        
-        # 放宽参数差异容忍度（2%）
-        tolerance = 0.02  # 允许2%的差异
+        tolerance = 0.02
+
         for param in ['alpha', 'beta', 'kappa']:
             py_val = py_results['parameters'][param]['value']
             r_val = r_results['parameters'][param]['value']
             diff = abs(py_val - r_val) / py_val
-            
-            self.assertLess(
-                diff,
-                tolerance,
-                f"参数 {param} 差异过大: Python={py_val:.4f}, R={r_val:.4f}, diff={diff:.2%}"
-            )
-        
+            self.assertLess(diff, tolerance,
+                            f"参数 {param} 差异过大: Python={py_val}, R={r_val}, diff={diff:.2%}")
         print("✅ R/Python模型等效性测试通过")
 
     def run_analysis(self, model_id, data):
@@ -229,25 +213,16 @@ class ActuarialPlatformTest(unittest.TestCase):
 
     def test_comparison_analysis(self):
         """测试对比分析功能"""
-        # 运行不同模型的分析
-        results = {}
-        for model_id in self.models:
-            results[model_id] = self.run_analysis(model_id, self.hmd_data)
-        
-        # 执行对比分析
+        results = {mid: self.run_analysis(mid, self.hmd_data)
+                   for mid in self.models}
         comparison_report = self.run_comparison(results)
-        
-        # 验证对比报告
+
         self.assertIn('summary', comparison_report, "对比报告缺少摘要")
-        
-        # 动态判断模型排名（非硬编码）
-        model_ranking = comparison_report['summary']['model_ranking']
-        best_model = min(results.keys(), key=lambda x: results[x]['diagnostics']['aic'])
-        worst_model = max(results.keys(), key=lambda x: results[x]['diagnostics']['aic'])
-        
-        self.assertEqual(model_ranking[0]['model_id'], best_model, "最佳模型排名异常")
-        self.assertEqual(model_ranking[-1]['model_id'], worst_model, "最差模型排名异常")
-        
+        ranking = comparison_report['summary']['model_ranking']
+        best = min(results, key=lambda x: results[x]['diagnostics']['aic'])
+        worst = max(results, key=lambda x: results[x]['diagnostics']['aic'])
+        self.assertEqual(ranking[0]['model_id'], best, "最佳模型排名异常")
+        self.assertEqual(ranking[-1]['model_id'], worst, "最差模型排名异常")
         print("✅ 对比分析测试通过")
 
     def run_comparison(self, results):
@@ -282,22 +257,17 @@ class ActuarialPlatformTest(unittest.TestCase):
         }
 
 if __name__ == '__main__':
-    # 运行测试
     suite = unittest.TestLoader().loadTestsFromTestCase(ActuarialPlatformTest)
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
-    
-    # 生成测试报告
+
     report = {
         "tests_run": result.testsRun,
         "failures": len(result.failures),
         "errors": len(result.errors),
         "success": result.wasSuccessful()
     }
-    
-    # 保存测试报告
     with open("test_report.json", "w") as f:
         json.dump(report, f, indent=2)
-    
     print("\n测试报告已保存至 test_report.json")
     
