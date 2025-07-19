@@ -20,7 +20,10 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \
     libssl-dev \
     libstdc++6 \
+    libcurl4-openssl-dev \
+    r-base-dev \               # 🔧 rpy2 安装 R 头文件需要
     && rm -rf /var/lib/apt/lists/*
+
 
 # 安装 Python 包
 RUN pip3 install --upgrade pip && pip3 install -r requirements.txt
