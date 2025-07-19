@@ -11,69 +11,60 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-
-    - name: Install R and dependencies
-      run: |
-        # 安装R
-        sudo apt-get update
-        sudo apt-get install -y r-base r-base-dev
-        
-        # 设置R环境变量
-        echo "R_HOME=$(R RHOME)" >> $GITHUB_ENV
-        
-        # 安装必要的R包
-        R -e "install.packages('demography', repos='https://cloud.r-project.org')"
-        R -e "install.packages('StMoMo', repos='https://cloud.r-project.org')"
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pandas numpy scipy unittest2
-        
-        # 安装rpy2前设置环境变量
-        export RPY2_CFFI_MODE=ABI
-        pip install rpy2==3.5.15
-        
-        # 验证rpy2安装
-        python -c "import rpy2; print(f'rpy2 version: {rpy2.__version__}')"
-
-    - name: Run tests
-      run: |
-        # 安装jq用于解析JSON
-        sudo apt-get install -y jq
-        
-        # 运行测试脚本
-        python test_actuarial_platform.py
-        
-        # 检查测试结果
-        if [ -f test_report.json ]; then
-          echo "测试报告:"
-          cat test_report.json
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
           
-          # 检查测试是否全部通过
-          if jq -e '.success == true' test_report.json; then
-            echo "所有测试通过 ✅"
+
+      - name: Set up R via setup-r
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3'    # 根据需要改
+
+      - name: Install R packages to user library
+        env:
+          # 将 R 包安装到项目目录下的 .R/library
+          R_LIBS_USER: ${{ github.workspace }}/.R/library
+        run: |
+          mkdir -p $R_LIBS_USER
+          # 指定 lib 参数，强制安装到 R_LIBS_USER
+          Rscript -e 'install.packages(c("demography","StMoMo"), lib=Sys.getenv("R_LIBS_USER"), repos="https://cloud.r-project.org")'
+
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy scipy unittest2
+          export RPY2_CFFI_MODE=ABI
+          pip install rpy2==3.5.15
+          python -c "import rpy2; print(f'rpy2 version: {rpy2.__version__}')"
+
+      - name: Run tests
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+          python test_actuarial_platform.py
+          if [ -f test_report.json ]; then
+            cat test_report.json
+            if jq -e '.success == true' test_report.json; then
+              echo "所有测试通过 ✅"
+            else
+              echo "测试失败 ❌"
+              exit 1
+            fi
           else
-            echo "测试失败 ❌"
+            echo "未找到测试报告"
             exit 1
           fi
-        else
-          echo "未找到测试报告"
-          exit 1
-        fi
 
-    - name: Upload test report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: actuarial-test-report
-        path: test_report.json
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: actuarial-test-report
+          path: test_report.json
