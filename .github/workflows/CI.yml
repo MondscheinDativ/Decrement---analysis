@@ -10,27 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 拉取代码
+      - name: Checkout 代码
         uses: actions/checkout@v4
 
-      # 新增：构建并运行 Docker 容器，替换原来的 R 依赖安装步骤
+      - name: 设置 R 环境
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3'
+
+      - name: 安装 R 包
+        run: |
+          Rscript -e 'install.packages("demography", repos="https://cloud.r-project.org")'
+
       - name: 构建并运行测试容器
         run: |
-          # 构建 Docker 镜像（会安装 R 和 Python 依赖）
           docker build -t actuarial-test .
-          # 运行容器并执行测试
-          docker run actuarial-test
+          docker run --rm actuarial-test
 
-      # 保留：安装 Python 依赖
-      - name: 安装 Python 依赖
+      - name: 设置 Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+
+      - name: 安装 Python 依赖
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 保留：执行测试
-      - name: 执行测试文件
+      - name: 运行 pytest 测试
         run: |
           pytest test_actuarial_platform.py -v
