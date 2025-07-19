@@ -11,26 +11,24 @@ pymort>=0.3.0          # 精算死亡率数据处理工具
 actuarialmath>=1.0.0   # 精算数学公式实现（生命表、准备金计算等）
 scikit-survival>=0.21.0 # 生存分析与机器学习结合（精算预测模型）
 
-# R与Python交互（关键！用于调用R的demography包）
-rpy2>=3.5.0            # Python调用R的核心库（需配合R环境）
-r-matrix>=1.5.0        # R的矩阵运算库（demography依赖）
-r-demography>=1.28     # R的人口统计学库（直接指定R包，rpy2会调用）
+# R与Python交互（关键！用于调用 R 环境中的 demography 包）
+rpy2>=3.5.0            # Python 调用 R 的核心库（需配合 R 环境）
 
 # 数据可视化（精算报告常用）
 matplotlib>=3.7.0      # 基础绘图
 seaborn>=0.12.0        # 统计绘图（生存曲线、死亡率趋势等）
 plotly>=5.15.0         # 交互式可视化（精算结果展示）
 
-# 数据IO与处理
-openpyxl>=3.1.0        # Excel文件读写（精算数据常存于Excel）
-xlrd>=2.0.1            # 旧版Excel文件支持
-csvkit>=1.0.7          # CSV数据处理工具
-json5>=0.9.14          # JSON数据处理（代码输出test_report.json）
+# 数据IO 与处理
+openpyxl>=3.1.0        # Excel 文件读写（精算数据常存于 Excel）
+xlrd>=2.0.1            # 旧版 Excel 文件支持
+csvkit>=1.0.7          # CSV 数据处理工具
+json5>=0.9.14          # JSON 数据处理（代码输出 test_report.json）
 
 # 其他工具（提升开发效率）
-ipython>=8.14.0        # 交互式Python环境（本地调试用）
-jupyter>=1.0.0         # notebooks（精算分析报告）
+ipython>=8.14.0        # 交互式 Python 环境（本地调试用）
+jupyter>=1.0.0         # Notebooks（精算分析报告）
 black>=23.1.0          # 代码格式化工具
 statsmodels>=0.14.0    # 统计建模优化
-scikit-learn>=1.2.0    #机器学习
+scikit-learn>=1.2.0    # 机器学习
 flake8>=6.0.0          # 代码检查工具
