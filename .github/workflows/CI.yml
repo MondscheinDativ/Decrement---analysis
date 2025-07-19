@@ -19,7 +19,13 @@ jobs:
           r-version: '4.3'
 
       - name: 安装 R 包
+        env:
+          # 指定用户级 R 库到工作区下的 .R/library
+          R_LIBS_USER: ${{ github.workspace }}/.R/library
         run: |
+          # 确保目录存在
+          mkdir -p $R_LIBS_USER
+          # 安装 demography 包到用户库
           Rscript -e 'install.packages("demography", repos="https://cloud.r-project.org")'
 
       - name: 构建并运行测试容器
