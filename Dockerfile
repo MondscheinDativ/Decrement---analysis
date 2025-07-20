@@ -21,8 +21,8 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libstdc++6 \
     libcurl4-openssl-dev \
-    r-base-dev \               # 🔧 rpy2 安装 R 头文件需要
-    && rm -rf /var/lib/apt/lists/*
+    r-base-dev \
+    && rm -rf /var/lib/apt/lists/*  # 清理apt缓存，减小镜像体积，rpy2 安装 R 头文件需要
 
 
 # 安装 Python 包
