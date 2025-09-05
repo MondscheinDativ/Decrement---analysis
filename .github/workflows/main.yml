@@ -54,7 +54,12 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build frontend
+      - name: Install dependencies
+        run: |
+          # For now, no npm build process, just static copy
+          echo "No frontend build needed"
+
+      - name: Build static site
         run: |
           mkdir -p dist
           cp -r web/* dist/
