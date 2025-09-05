@@ -1,0 +1,32 @@
+<div class="container mt-4">
+  <h2>模型分析</h2>
+  <p class="text-muted">上传或选择数据集，运行清洗与自动诊断报告。</p>
+
+  <!-- Upload custom dataset -->
+  <div class="mb-3">
+    <label for="customFile" class="form-label">上传自定义数据 (CSV)</label>
+    <input class="form-control" type="file" id="customFile" accept=".csv" />
+  </div>
+
+  <!-- Dataset select -->
+  <div class="mb-3">
+    <label for="datasetSelect" class="form-label">选择已有数据集</label>
+    <select id="datasetSelect" class="form-select">
+      <option>加载中…</option>
+    </select>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="mb-3">
+    <button id="cleanDataBtn" class="btn btn-warning" disabled>清洗数据</button>
+    <button id="generateReportBtn" class="btn btn-success" disabled>生成诊断报告</button>
+  </div>
+
+  <!-- Report output -->
+  <div id="reportContainer" class="card mt-3" style="display:none;">
+    <div class="card-body">
+      <h5 class="card-title">诊断报告</h5>
+      <pre id="reportContent" style="max-height:400px;overflow:auto;"></pre>
+    </div>
+  </div>
+</div>
