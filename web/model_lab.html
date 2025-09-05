@@ -1,5 +1,24 @@
 <div class="container mt-4">
   <h2>模型实验室</h2>
   <p class="text-muted">选择精算模型并设置参数，运行预测。</p>
-  <div id="modelLabContent" class="mt-3"></div>
+
+  <!-- Model selector -->
+  <div class="mb-3">
+    <label for="modelSelect" class="form-label">选择模型</label>
+    <select id="modelSelect" class="form-select">
+      <option value="lee-carter">Lee-Carter</option>
+      <option value="cbd">CBD</option>
+      <option value="gompertz">Gompertz</option>
+      <option value="apc">APC</option>
+      <option value="soa-calibration">SOA 标准校准器</option>
+    </select>
+  </div>
+
+  <!-- Parameters placeholder -->
+  <div id="modelParams" class="mb-3">
+    <p><em>参数设置将在后续实现中显示。</em></p>
+  </div>
+
+  <!-- Run button -->
+  <button class="btn btn-primary">运行模型</button>
 </div>
