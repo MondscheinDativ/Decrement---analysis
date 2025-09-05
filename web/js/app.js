@@ -4,11 +4,21 @@ const API = (p) => `${AppConfig.API_BASE_URL}/api${p}`;
 
 window.loadPage = function(page) {
   const container = document.getElementById('main-content');
-  fetch(`${page}.html`).then(r=>r.text()).then(html=>{ container.innerHTML = html; initPage(page); });
+  fetch(`${page}.html`)
+    .then(r => r.text())
+    .then(html => {
+      container.innerHTML = html;
+      initPage(page);
+    });
 };
 
 function initPage(page){
   if(page === 'analysis') initAnalysis();
+  if(page === 'history') initHistory();
+  if(page === 'model_lab') initModelLab();
+  if(page === 'sensitivity') initSensitivity();
+  if(page === 'cases') initCases();
+  if(page === 'help') initHelp();
 }
 
 function initAnalysis(){
@@ -48,21 +58,58 @@ function initAnalysis(){
 
   // clean
   document.getElementById('cleanDataBtn')?.addEventListener('click', async ()=>{
-    const res = await fetch(API('/clean-data'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({data: window.__DATA__||[], options:{}})});
+    const res = await fetch(API('/clean-data'), {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({data: window.__DATA__||[], options:{}})
+    });
     const json = await res.json(); window.__DATA__ = json.data || window.__DATA__;
   });
 
   // report
   document.getElementById('generateReportBtn')?.addEventListener('click', async ()=>{
-    const res = await fetch(API('/generate-report'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({data: window.__DATA__||[]})});
+    const res = await fetch(API('/generate-report'), {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({data: window.__DATA__||[]})
+    });
     const json = await res.json();
     const el = document.getElementById('reportContent');
-    if(el){ el.innerHTML = `<pre>${JSON.stringify(json.report, null, 2)}</pre>`; document.getElementById('reportContainer').style.display='block'; }
+    if(el){
+      el.innerHTML = `<pre>${JSON.stringify(json.report, null, 2)}</pre>`;
+      document.getElementById('reportContainer').style.display='block';
+    }
   });
+}
+
+// -------- New page hooks --------
+function initHistory(){
+  document.getElementById('historyContent').innerHTML = "<em>历史分析加载中…</em>";
+}
+
+function initModelLab(){
+  document.getElementById('modelLabContent').innerHTML = "<em>模型实验室功能开发中…</em>";
+}
+
+function initSensitivity(){
+  document.getElementById('sensitivityContent').innerHTML = "<em>敏感性测试功能开发中…</em>";
+}
+
+function initCases(){
+  document.getElementById('casesContent').innerHTML = "<em>案例测试功能开发中…</em>";
+}
+
+function initHelp(){
+  const el = document.getElementById('helpContent');
+  if(el) el.innerHTML = "<em>帮助文档加载中…</em>";
 }
 
 // boot
 document.addEventListener('DOMContentLoaded', ()=>{
-  // load nav then index
-  fetch('navigation.html').then(r=>r.text()).then(html=>{ document.getElementById('navigation').innerHTML = html; loadPage('index'); });
+  fetch('navigation.html')
+    .then(r=>r.text())
+    .then(html=>{
+      document.getElementById('navigation').innerHTML = html;
+      loadPage('index');
+    });
 });
