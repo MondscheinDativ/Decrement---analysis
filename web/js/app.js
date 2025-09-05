@@ -21,6 +21,9 @@ function initPage(page){
   if(page === 'help') initHelp();
 }
 
+/* -------------------------
+   Analysis Page
+------------------------- */
 function initAnalysis(){
   // load models
   fetch(API('/models')).then(r=>r.json()).then(({models})=>{
@@ -36,7 +39,7 @@ function initAnalysis(){
     });
   });
 
-  // dataset select
+  // dataset select (in-memory + uploaded)
   fetch(API('/datasets')).then(r=>r.json()).then(({datasets})=>{
     const sel = document.getElementById('datasetSelect');
     if(!sel) return;
@@ -82,29 +85,97 @@ function initAnalysis(){
   });
 }
 
-// -------- New page hooks --------
+/* -------------------------
+   History Page
+------------------------- */
 function initHistory(){
-  document.getElementById('historyContent').innerHTML = "<em>历史分析加载中…</em>";
+  const container = document.getElementById('historyContent');
+  if(!container) return;
+
+  container.innerHTML = `
+    <div class="mb-3">
+      <label for="historySource" class="form-label">选择数据源</label>
+      <select id="historySource" class="form-select">
+        <option value="CDC_RAW">CDC Raw Dataset</option>
+        <option value="HMD_RAW">HMD Raw Dataset</option>
+        <option value="SOA_CASE">SOA Case (CDC raw demo)</option>
+      </select>
+      <button id="loadHistoryBtn" class="btn btn-primary mt-2">加载数据</button>
+    </div>
+    <div id="historyResult" class="mt-3"></div>
+  `;
+
+  document.getElementById('loadHistoryBtn').addEventListener('click', async ()=>{
+    const src = document.getElementById('historySource').value;
+    const res = await fetch(API('/fetch-data'), {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({source: src})
+    });
+    const json = await res.json();
+    const target = document.getElementById('historyResult');
+    target.innerHTML = `<pre>${JSON.stringify(json.data.slice(0,20), null, 2)}</pre>`;
+  });
 }
 
+/* -------------------------
+   Model Lab Page
+------------------------- */
 function initModelLab(){
   document.getElementById('modelLabContent').innerHTML = "<em>模型实验室功能开发中…</em>";
 }
 
+/* -------------------------
+   Sensitivity Page
+------------------------- */
 function initSensitivity(){
   document.getElementById('sensitivityContent').innerHTML = "<em>敏感性测试功能开发中…</em>";
 }
 
+/* -------------------------
+   Cases Page
+------------------------- */
 function initCases(){
-  document.getElementById('casesContent').innerHTML = "<em>案例测试功能开发中…</em>";
+  const container = document.getElementById('casesContent');
+  if(!container) return;
+
+  container.innerHTML = `
+    <div class="mb-3">
+      <label for="caseSource" class="form-label">选择案例数据源</label>
+      <select id="caseSource" class="form-select">
+        <option value="SOA_CASE">SOA Case (CDC raw demo)</option>
+        <option value="CDC_RAW">CDC Raw Dataset</option>
+        <option value="HMD_RAW">HMD Raw Dataset</option>
+      </select>
+      <button id="runCaseBtn" class="btn btn-success mt-2">运行案例</button>
+    </div>
+    <div id="caseResult" class="mt-3"></div>
+  `;
+
+  document.getElementById('runCaseBtn').addEventListener('click', async ()=>{
+    const src = document.getElementById('caseSource').value;
+    const res = await fetch(API('/fetch-data'), {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({source: src})
+    });
+    const json = await res.json();
+    const target = document.getElementById('caseResult');
+    target.innerHTML = `<pre>${JSON.stringify(json.data.slice(0,20), null, 2)}</pre>`;
+  });
 }
 
+/* -------------------------
+   Help Page
+------------------------- */
 function initHelp(){
   const el = document.getElementById('helpContent');
   if(el) el.innerHTML = "<em>帮助文档加载中…</em>";
 }
 
-// boot
+/* -------------------------
+   Boot
+------------------------- */
 document.addEventListener('DOMContentLoaded', ()=>{
   fetch('navigation.html')
     .then(r=>r.text())
